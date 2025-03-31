@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} = {{title}}{% endblock %}
+
+{% block body %}
+    <h1>{{title}}</h1>
+    <a href="{{ path(routesubmit) }}" class="btn btn-success">Ajouter</a>
+
+            <div class="dataTable_wrapper">
+                <table class="table table-striped table-bordered table-hover" id="dataTables" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th width="70px" class="no-sort">Action</th>
+                        <th width="70px">Logo</th>
+                        <th>Nom</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                            <tr>
+                                <td><a href="{{ path(routeupdate,{id:project.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
+                                <td><img class="avatar" src="{{ asset(project.logo)}}"></td>
+                                <td>{{project.title}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        $(document).ready(function() {
+            $('#dataTables').DataTable({
+                columnDefs: [ { "targets": "no-sort", "orderable": false }, { "targets": "no-string", "type" : "num" } ],
+                responsive: true,
+                iDisplayLength: 100,
+                order: [[ 2, "asc" ]]
+            });
+        });
+    </script>
+{% endblock %}

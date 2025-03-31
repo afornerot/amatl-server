@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: amatl-mariadb
+    restart: unless-stopped  
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: amatl
+      MYSQL_USER: user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  amatlserver:
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile
+    container_name: amatl-server
+    restart: unless-stopped  
+    image: reg.cadoles.com/envole/amatl
+    depends_on: 
+      - mariadb
+    env_file: .env
+    ports:
+      - "8008:80"
+    volumes:
+      - .:/app:delegated
+
+  adminer:
+    image: adminer
+    container_name: amatl-adminer
+    restart: always
+    ports:
+      - 6088:8080
+
+volumes:
+  mariadb-data:
+
+
