@@ -38,6 +38,11 @@ class ProjectController extends AbstractController
         $form = $this->createForm(ProjectType::class, $project, ['mode' => 'submit']);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $newToken = $form->get('gitToken')->getData();
+            if ($newToken) {
+                $project->setGitToken($newToken);
+            }
+
             $em->persist($project);
             $em->flush();
 
@@ -66,6 +71,11 @@ class ProjectController extends AbstractController
         $form = $this->createForm(ProjectType::class, $project, ['mode' => 'update']);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $newToken = $form->get('gitToken')->getData();
+            if ($newToken) {
+                $project->setGitToken($newToken);
+            }
+
             $em->flush();
 
             return $this->redirectToRoute('app_admin_project');

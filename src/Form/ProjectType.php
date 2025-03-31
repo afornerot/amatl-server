@@ -7,6 +7,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,6 +29,24 @@ class ProjectType extends AbstractType
 
         ->add('logo', HiddenType::class)
 
+        ->add('gitUrl', TextType::class, [
+            'label' => 'URL du dépôt Git',
+            'attr' => ['autocomplete' => 'off'],
+        ])
+
+        ->add('gitUsername', TextType::class, [
+            'label' => 'Nom d’utilisateur Git',
+            'required' => false,
+            'attr' => ['autocomplete' => 'off'],
+        ])
+        
+        ->add('gitToken', PasswordType::class, [
+            'label' => 'Token Git',
+            'required' => false,
+            'mapped' => false,
+            'attr' => ['autocomplete' => 'new-password'],
+        ])
+                
         ->add('users', EntityType::class, [
             'label' => 'Utilisateurs',
             'class' => User::class,
