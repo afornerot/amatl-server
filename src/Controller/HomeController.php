@@ -26,6 +26,7 @@ class HomeController extends AbstractController
     {
         $project = $request->getSession()->get('project');
         $this->gitService->cloneRepository($project);
+        $doc = $request->query->get('doc'); // Récupérer le paramètre doc
 
         return $this->render('home/home.html.twig', [
             'usemenu' => true,
@@ -33,6 +34,7 @@ class HomeController extends AbstractController
             'projectId' => $project->getId(),
             'projectUuid' => $project->getUuid(),
             'files' => $this->projectService->list($project->getId()),
+            'doc' => $doc,
         ]);
     }
 

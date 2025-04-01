@@ -58,8 +58,29 @@
                     let url = "{{ path('view_file', { idProject: projectId, filePath: 'xxx' }) }}";
                     url=url.replace('xxx',filePath);
                     document.getElementById("preview-frame").src = url;
+
+                    // Mettre à jour l'URL dans la barre d'adresse
+                    let newUrl = new URL(window.location);
+                    newUrl.searchParams.set("doc", filePath);
+                    history.pushState({}, "", newUrl);               
                 });
             });
+
+            {% if doc %}
+                let url = "{{ path('view_file', { idProject: projectId, filePath: doc }) }}";
+                document.getElementById("preview-frame").src = url;
+
+                let fileElement = document.querySelector(`[data-file-path="{{doc}}"]`);
+                if (fileElement) {
+                    // Déplier les parents pour le rendre visible
+                    let parent = fileElement.closest("ul");
+                    while (parent) {
+                        parent.style.display = "block"; // Affiche le UL parent
+                        let parentLi = parent.closest("li");
+                        parent = parentLi ? parentLi.closest("ul") : null;
+                    }
+                }                
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -73,7 +94,7 @@
                         <span class="folder-toggle" style="cursor: pointer; font-weight: bold;">{{ file }}</span>
                         {{ _self.file_tree(subFiles, projectId, file, niveau+1) }}
                     {% else %}
-                        <a href="#" class="file-link" data-file-path="{{ subFiles|trim('/') }}">{{ file }}</a>
+                        <a href="#" class="file-link" data-file-path="{{ subFiles|trim('/') }}">{{ file|replace({".html":""}) }}</a>
                     {% endif %}
                 </li>
             {% endfor %}

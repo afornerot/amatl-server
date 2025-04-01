@@ -47,6 +47,7 @@ class InitCommand extends Command
             $project = new Project();
             $project->setTitle($this->params->get('appName'));
             $project->setUuid(Uuid::uuid4());
+            $project->setGitUrl("https://github.com/afornerot/amatl-doc.git");
             $this->em->persist($project);
             $this->em->flush();
         }

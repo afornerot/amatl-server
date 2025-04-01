@@ -24,6 +24,11 @@ class GitService
     {
         $projectPath = $this->getProjectPath($project->getId());
 
+        // Vérifie que le projet est lié à un repository
+        if(!$project->getGitUrl()) {
+            return true;
+        }
+
         // Vérifie si le projet existe déjà
         if (is_dir($projectPath . '/.git')) {
             $this->logger->info("Le dépôt existe déjà pour le projet {$project->getId()}, mise à jour avec git pull...");
