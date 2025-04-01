@@ -31,12 +31,12 @@ class GitService
         }
 
         // Si un token est fourni, on l’intègre dans l'URL
+        $repoUrl=$project->getGitUrl();
         if ($project->getGitUsername() && $project->getGitToken()) {
             $repoUrl = preg_replace('#^(https?://)#', '$1' . urlencode($project->getGitUsername()) . ':' . urlencode($project->getGitToken()) . '@', $project->getGitUrl());
         }
 
         // Exécute la commande git clone
-        $process = new Process(['git', 'clone', $repoUrl, $projectPath]);
         $process = new Process(['git', 'clone', $repoUrl, $projectPath]);
         $process->setTimeout(null); // 🔥 Désactivation du timeout 🔥
         $process->start(); // Lancer le process en asynchrone
