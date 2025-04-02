@@ -28,12 +28,26 @@ class HomeController extends AbstractController
         $this->gitService->cloneRepository($project);
         $doc = $request->query->get('doc'); // Récupérer le paramètre doc
 
+        $files=$this->projectService->list($project->getId());
+        $readmes = ["/README.html", "/Readme.html", "readme.html"];
+        $readme = false;
+        foreach ($readmes as $target) {
+            if (($key = array_search($target, $files, true)) !== false) {
+                $readme = $key;
+                break; // On s'arrête dès qu'on trouve une correspondance
+            }
+        }
+
+        if(!$doc) {
+            $doc=$readme;
+        }
+
         return $this->render('home/home.html.twig', [
             'usemenu' => true,
             'usesidebar' => false,
             'projectId' => $project->getId(),
             'projectUuid' => $project->getUuid(),
-            'files' => $this->projectService->list($project->getId()),
+            'files'=> $files,
             'doc' => $doc,
         ]);
     }

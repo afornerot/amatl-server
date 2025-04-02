@@ -1,3 +1,4 @@
 {
-    "amatl.generatePdfOnSave": false
+    "amatl.generatePdfOnSave": false,
+    "amatl.generateHtmlOnSave": false
 }
