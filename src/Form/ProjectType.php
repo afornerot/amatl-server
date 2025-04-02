@@ -31,6 +31,7 @@ class ProjectType extends AbstractType
 
         ->add('gitUrl', TextType::class, [
             'label' => 'URL du dépôt Git',
+            'required' => false,
             'attr' => ['autocomplete' => 'off'],
         ])
 

@@ -3,10 +3,15 @@
 namespace App\Service;
 
 use App\Entity\Project;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
+
+use function PHPUnit\Framework\throwException;
 
 class GitService
 {
@@ -59,6 +64,19 @@ class GitService
 
         $this->logger->info("Dépôt cloné avec succès dans {$projectPath}");
         return true;
+    }
+
+    public function recloneRepository(Project $project): bool
+    {
+        $filesystem = new Filesystem();
+        $projectPath = $this->getProjectPath($project->getId());
+        try {
+            $filesystem->remove($projectPath);
+        } catch (IOExceptionInterface $exception) {
+            throw new BadRequestHttpException("Erreur lors de la suppression du répertoire: " . $exception->getMessage());
+        }  
+        
+        return $this->cloneRepository($project);
     }
 
     public function updateRepository(Project $project): bool

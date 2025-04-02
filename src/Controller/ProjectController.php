@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\User;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use App\Service\GitService;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +16,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ProjectController extends AbstractController
 {
+    private GitService $gitService;
+    public function __construct(GitService $gitService)
+    {
+        $this->gitService = $gitService;
+    }
+
+    
     #[Route('/admin/project', name: 'app_admin_project')]
     public function list(ProjectRepository $projectRepository): Response
     {
@@ -46,6 +55,7 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
 
+            $this->gitService->cloneRepository($project);
             return $this->redirectToRoute('app_admin_project');
         }
 
@@ -67,6 +77,7 @@ class ProjectController extends AbstractController
         if (!$project) {
             return $this->redirectToRoute('app_admin_project');
         }
+        $oldGitUrl=$project->getGitUrl();
 
         $form = $this->createForm(ProjectType::class, $project, ['mode' => 'update']);
         $form->handleRequest($request);
@@ -77,6 +88,10 @@ class ProjectController extends AbstractController
             }
 
             $em->flush();
+
+            if($oldGitUrl!==$project->getGitUrl()) {
+                $this->gitService->recloneRepository($project);
+            }
 
             return $this->redirectToRoute('app_admin_project');
         }
@@ -99,6 +114,12 @@ class ProjectController extends AbstractController
         $project = $em->getRepository(Project::class)->find($id);
         if (!$project) {
             return $this->redirectToRoute('app_admin_project');
+        }
+
+        $users=$em->getRepository(User::class)->findBy(["project"=>$project]);
+        foreach($users as $user) {
+            $user->setProject(null);
+            $em->flush();
         }
 
         // Tentative de suppression
