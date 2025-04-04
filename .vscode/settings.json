@@ -1,4 +1,6 @@
 {
     "amatl.generatePdfOnSave": false,
-    "amatl.generateHtmlOnSave": false
+    "amatl.generateHtmlOnSave": false,
+    "vscode-php-cs-fixer.toolPath": "/home/afornerot/cadoles/poc-project/amatl-server/vendor/bin/php-cs-fixer",
+    "vscode-php-cs-fixer.config": "/home/afornerot/cadoles/poc-project/amatl-server/.php-cs-fixer.dist.php"
 }

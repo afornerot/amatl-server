@@ -55,6 +55,7 @@ class ProjectType extends AbstractType
             'multiple' => true,
             'attr' => ['class' => 'select2'],
             'required' => false,
+            'by_reference' => false,
         ]);
     }
 

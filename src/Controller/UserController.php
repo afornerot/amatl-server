@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,9 +41,14 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
+            $password = $user->getPassword();
+            if ('CAS' === $this->getParameter('modeAuth')) {
+                $password = Uuid::uuid4();
+            }
+
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
-                $user->getPassword()
+                $password
             );
             $user->setPassword($hashedPassword);
 

@@ -17,12 +17,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProjectController extends AbstractController
 {
     private GitService $gitService;
+
     public function __construct(GitService $gitService)
     {
         $this->gitService = $gitService;
     }
 
-    
     #[Route('/admin/project', name: 'app_admin_project')]
     public function list(ProjectRepository $projectRepository): Response
     {
@@ -56,6 +56,7 @@ class ProjectController extends AbstractController
             $em->flush();
 
             $this->gitService->cloneRepository($project);
+
             return $this->redirectToRoute('app_admin_project');
         }
 
@@ -77,7 +78,7 @@ class ProjectController extends AbstractController
         if (!$project) {
             return $this->redirectToRoute('app_admin_project');
         }
-        $oldGitUrl=$project->getGitUrl();
+        $oldGitUrl = $project->getGitUrl();
 
         $form = $this->createForm(ProjectType::class, $project, ['mode' => 'update']);
         $form->handleRequest($request);
@@ -89,7 +90,7 @@ class ProjectController extends AbstractController
 
             $em->flush();
 
-            if($oldGitUrl!==$project->getGitUrl()) {
+            if ($oldGitUrl !== $project->getGitUrl()) {
                 $this->gitService->recloneRepository($project);
             }
 
@@ -116,8 +117,8 @@ class ProjectController extends AbstractController
             return $this->redirectToRoute('app_admin_project');
         }
 
-        $users=$em->getRepository(User::class)->findBy(["project"=>$project]);
-        foreach($users as $user) {
+        $users = $em->getRepository(User::class)->findBy(['project' => $project]);
+        foreach ($users as $user) {
             $user->setProject(null);
             $em->flush();
         }
@@ -139,7 +140,12 @@ class ProjectController extends AbstractController
     public function viewFile(int $idProject, string $filePath, EntityManagerInterface $em): Response
     {
         $project = $em->getRepository(Project::class)->find($idProject);
-        if (!$project || !$this->getUser()->getProjects()->contains($project)) {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('L\'utilisateur doit être une instance de User.');
+        }
+
+        if (!$project || !$user->getProjects()->contains($project)) {
             throw $this->createAccessDeniedException('Vous ne disposez pas des droits pour visualiser ce document.');
         }
 

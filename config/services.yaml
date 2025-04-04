@@ -3,6 +3,7 @@ parameters:
   appSecret: "%env(resolve:APP_SECRET)%"
   appName: "%env(resolve:APP_NAME)%"
   appNoreply: "%env(resolve:APP_NOREPLY)%"
+  appAdmin: "%env(resolve:APP_ADMIN)%"
   modeAuth: "%env(resolve:MODE_AUTH)%"
   casHost: "%env(resolve:CAS_HOST)%"
   casPort: "%env(resolve:CAS_PORT)%"

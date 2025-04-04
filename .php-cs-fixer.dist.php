@@ -1,7 +1,15 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__.'/src')
+    ->in(__DIR__)
+    ->exclude([
+        'vendor',
+        'var',
+        'web',
+        'app/DoctrineMigrations',
+        'bin',
+        'doc',
+    ])
     ->name('*.php')
 ;
 

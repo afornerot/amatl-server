@@ -52,26 +52,30 @@ class InitCommand extends Command
             $this->em->flush();
         }
 
-        $user = $this->em->getRepository("App\Entity\User")->findOneBy(['username' => 'admin']);
-        if (!$user) {
-            $io->text('> Création du compte admin par defaut');
-            $user = new User();
+        $admins=array_map('trim', explode(',', $this->params->get('appAdmin')));
+        foreach($admins as $admin) {
+            $user = $this->em->getRepository("App\Entity\User")->findOneBy(['username' => $admin]);
+            if (!$user) {
+                $io->text('> Création du compte admin par defaut = '.$admin);
+                $user = new User();
 
-            $hashedPassword = $this->passwordHasher->hashPassword(
-                $user,
-                $this->params->get('appSecret')
-            );
+                $hashedPassword = $this->passwordHasher->hashPassword(
+                    $user,
+                    $this->params->get('appSecret')
+                );
 
-            $user->setUsername('admin');
-            $user->setPassword($hashedPassword);
-            $user->setAvatar('medias/avatar/admin.jpg');
-            $user->setEmail($this->params->get('appNoreply'));
-            $user->addProject($project);
-            $user->setProject($project);
-            $this->em->persist($user);
+                $user->setUsername($admin);
+                $user->setPassword($hashedPassword);
+                $user->setAvatar('medias/avatar/admin.jpg');
+                $user->setEmail($this->params->get('appNoreply'));
+                $user->addProject($project);
+                $user->setProject($project);
+                $this->em->persist($user);
+            }
+
+            $user->setRoles(['ROLE_ADMIN']);
+            $this->em->flush();
         }
-        $user->setRoles(['ROLE_ADMIN']);
-        $this->em->flush();
 
         return Command::SUCCESS;
     }

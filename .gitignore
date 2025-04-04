@@ -8,6 +8,7 @@
 /vendor/
 /public/uploads
 /uploads
+/.vscode
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
