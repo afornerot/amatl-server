@@ -25,6 +25,9 @@ class HomeController extends AbstractController
     public function home(Request $request, DocumentRepository $documentRepository): Response
     {
         $project = $request->getSession()->get('project');
+        if(!$project) {
+            return $this->noproject();
+        }
         $this->gitService->cloneRepository($project);
         $doc = $request->query->get('doc'); // Récupérer le paramètre doc
 

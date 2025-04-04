@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   mariadb:
     image: mariadb
@@ -22,7 +20,6 @@ services:
     image: reg.cadoles.com/envole/amatl
     depends_on: 
       - mariadb
-    env_file: .env
     ports:
       - "8008:80"
     volumes:
@@ -34,8 +31,22 @@ services:
     restart: always
     ports:
       - 6088:8080
+  corpus:
+    image: ghcr.io/bornholm/corpus:latest
+    container_name: corpus_container
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      - CORPUS_LLM_PROVIDER_KEY=changeme
+      - CORPUS_LLM_PROVIDER_BASE_URL=https://api.mistral.ai/v1/
+      - CORPUS_LLM_PROVIDER_CHAT_COMPLETION_MODEL=mistral-small-latest
+      - CORPUS_LLM_PROVIDER_EMBEDDINGS_MODEL=mistral-embed
+    volumes:
+      - corpus_data:/data
+    stdin_open: true
+    tty: true
 
 volumes:
   mariadb-data:
-
+  corpus_data:
 

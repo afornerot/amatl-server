@@ -1,0 +1,4 @@
+services:
+  corpus:
+    environment:
+      - CORPUS_LLM_PROVIDER_KEY=aTBGJ3HM87nbu7plVcQue4tAejf66cjE

@@ -36,7 +36,7 @@ class UserController extends AbstractController
     {
         $user = new User();
 
-        $form = $this->createForm(UserType::class, $user, ['mode' => 'submit']);
+        $form = $this->createForm(UserType::class, $user, ['mode' => 'submit', 'modeAuth' => $this->getParameter('modeAuth')]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
@@ -72,7 +72,7 @@ class UserController extends AbstractController
         }
         $hashedPassword = $user->getPassword();
 
-        $form = $this->createForm(UserType::class, $user, ['mode' => 'update']);
+        $form = $this->createForm(UserType::class, $user, ['mode' => 'update', 'modeAuth' => $this->getParameter('modeAuth')]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
@@ -129,7 +129,7 @@ class UserController extends AbstractController
         }
         $hashedPassword = $user->getPassword();
 
-        $form = $this->createForm(UserType::class, $user, ['mode' => 'profil']);
+        $form = $this->createForm(UserType::class, $user, ['mode' => 'profil', 'modeAuth' => $this->getParameter('modeAuth')]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();

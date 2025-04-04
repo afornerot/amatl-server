@@ -30,14 +30,6 @@ class UserType extends AbstractType
             'label' => 'Login',
         ])
 
-        ->add('password', RepeatedType::class, [
-            'type' => PasswordType::class,
-            'required' => ('submit' == $options['mode'] ? true : false),
-            'options' => ['always_empty' => true],
-            'first_options' => ['label' => 'Mot de Passe', 'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px', 'autocomplete' => 'new-password']],
-            'second_options' => ['label' => 'Confirmer Mot de Passe', 'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px']],
-        ])
-
         ->add('avatar', HiddenType::class)
 
         ->add('email', EmailType::class, [
@@ -60,6 +52,17 @@ class UserType extends AbstractType
                 'attr' => ['class' => 'select2'],
             ]);
         }
+
+        if('SQL' === $options['modeAuth']) {
+            $builder
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'required' => ('submit' == $options['mode'] ? true : false),
+                'options' => ['always_empty' => true],
+                'first_options' => ['label' => 'Mot de Passe', 'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px', 'autocomplete' => 'new-password']],
+                'second_options' => ['label' => 'Confirmer Mot de Passe', 'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px']],
+            ]);        
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -67,6 +70,7 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'mode' => 'submit',
+            'modeAuth' => 'SQL',
         ]);
     }
 }
