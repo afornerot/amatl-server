@@ -1,0 +1,58 @@
+services:
+  mariadb:
+    image: mariadb
+    container_name: amatl-mariadb
+    restart: unless-stopped  
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: amatl
+      MYSQL_USER: user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  amatl:
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile
+    container_name: amatl
+    restart: unless-stopped  
+    image: reg.cadoles.com/envole/amatl
+    depends_on: 
+      - mariadb
+    ports:
+      - "8008:80"
+    volumes:
+      - .:/app:delegated
+
+  adminer:
+    image: adminer
+    container_name: amatl-adminer
+    restart: always
+    ports:
+      - 6088:8080
+  corpus:
+    image: ghcr.io/bornholm/corpus:latest
+    container_name: corpus
+    restart: unless-stopped
+    ports:
+      - 3002:3002
+    environment:
+      - CORPUS_HTTP_BASE_URL=http://localhost:3002
+      - CORPUS_LLM_PROVIDER_KEY=changeme
+      - CORPUS_LLM_PROVIDER_BASE_URL=https://api.mistral.ai/v1/
+      - CORPUS_LLM_PROVIDER_CHAT_COMPLETION_MODEL=mistral-small-latest
+      - CORPUS_LLM_PROVIDER_EMBEDDINGS_MODEL=mistral-embed
+      - CORPUS_LLM_PROVIDER_KEY=changeme
+      - CORPUS_HTTP_AUTH_WRITER_USERNAME=writer
+      - CORPUS_HTTP_AUTH_WRITER_PASSWORD=changeme
+      - CORPUS_LOGGER_LEVEL=-4
+    volumes:
+      - corpus_data:/data
+    stdin_open: true
+    tty: true
+
+volumes:
+  mariadb-data:
+  corpus_data:
+

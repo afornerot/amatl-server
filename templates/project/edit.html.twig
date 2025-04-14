@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} = {{title}}{% endblock %}
+
+{% block body %}
+    <h1>{{title}}</h1>
+    
+
+    {{ form_start(form) }}
+        {{ form_widget(form.submit) }}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary ms-1">Annuler</a>
+        {%if mode=="update" %}<a href="{{ path(routedelete,{id:form.vars.value.id}) }}" class="btn btn-danger float-end" onclick="return confirm('Confirmez-vous la suppression de cet enregistrement ?')">Supprimer</a>{%endif%}
+
+        {% include('include/error.html.twig') %}
+
+        <div class="text-center d-flex flex-column align-items-center">
+            <img id="project_logo_img" src="{{asset(form.vars.value.logo)}}" class="bigavatar mb-2">
+            {{ form_row(form.logo) }}
+            <a class="btn btn-info" style="max-width:100%; margin-bottom:15px;" data-bs-toggle="modal" data-bs-target="#mymodal" onClick="ModalLoad('mymodal','Logo','{{ path('app_user_upload_crop01',{endpoint:'logo',reportThumb:'project_logo'}) }}');" title='Ajouter un logo'>Modifier</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card mt-3">
+                    <div class="card-header">Information</div>
+                    <div class="card-body">
+                        {{ form_row(form.title) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mx-auto">
+                <div class="card mt-3">
+                    <div class="card-header">Permissions</div>
+                    <div class="card-body">
+                    {{ form_row(form.users) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{ form_end(form) }}
+
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        $(document).ready(function() {
+            $("#project_title").focus();
+        });
+    </script>
+{% endblock %}

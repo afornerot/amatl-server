@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{{appName}}{% block title %}{% endblock %}</title>
+        <link rel="icon" href="">
+                
+        <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/bootswatch/bootswatch.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/fontawesome/css/all.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/datatables/datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/select2/select2.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/select2/select2-bootstrap-5-theme.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone-bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/imgareaselect/css/imgareaselect-default.css') }}">
+        
+        <link rel="stylesheet" href="{{ asset('lib/app/app.css') }}">
+        
+        <script src="{{ asset('lib/jquery/jquery.min.js')  }}"></script>
+        <script src="{{ asset('lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('lib/fontawesome/fontawesome-free.index.js') }}"></script>
+        <script src="{{ asset('lib/datatables/datatables.min.js') }}"></script>
+        <script src="{{ asset('lib/datatables/datatables.init.js') }}"></script>
+        <script src="{{ asset('lib/select2/select2.min.js') }}"></script>
+        <script src="{{ asset('lib/select2/select2.init.js') }}"></script>
+        <script src="{{ asset('lib/dropzone/dropzone.min.js') }}"></script>
+        <script src="{{ asset('lib/imgareaselect/js/jquery.imgareaselect.dev.js') }}"></script>
+        <script src="{{ asset('lib/app/app.js') }}"></script>
+
+        {% block javascripts %}
+            
+        {% endblock %}
+    </head>
+
+    {% block localstyle %}
+    {% endblock %}
+
+    <body>
+        {% if usemenu is defined and usemenu %}
+            <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+                <div class="container-fluid">                
+                    <a class="navbar-brand" href="{{ path('app_home') }}">
+                        {% if app.session.get('project') %}
+                            <img src="{{asset(app.session.get('project').logo)}}"> Projet = {{app.session.get('project').title}}
+                        {% else %}
+                            <img src="{{asset("medias/logo/logo.png")}}"> {{appName}}
+                        {% endif %}
+                    </a>
+                    
+                    <div class="collapse navbar-collapse" id="navbarColor02">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                
+                            </li>
+                        </ul>
+                    </div>
+                
+                    <div class="navbar-nav ms-auto ps-3 d-flex flex-row position-absolute" style="right: 15px; top:15px">
+                        {% if app.user %}
+                            <div class="nav-link">
+                                <select class="select2" name="selectproject" id="selectproject" style="width:200px" data-change="{{path('app_user_selectproject')}}">
+                                    <option value="" disabled selected>Selectionnez un projet</option>
+                                    {%for project in app.session.get('projects')%}
+                                        <option value="{{project.id}}" {{app.session.get('project') and project.id==app.session.get('project').id?"selected":""}}>{{project.title}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="nav-link px-2" href="{{path('app_admin')}}"><i class="fa-solid fa-cog fa-2x"></i></a>
+                            {% endif %}
+                            <a class="nav-link px-2" href="{{path('app_user_profil')}}"><img src="{{asset(app.user.avatar)}}" class="avatar"></a>
+                            <a class="nav-link px-2" href="{{path('app_logout')}}"><i class="fa-solid fa-right-from-bracket fa-2x"></i></a>
+                        {% else %}
+                            <a class="nav-link px-2" href="{{path('app_login')}}"><i class="fa-solid fa-right-to-bracket fa-2x"></i></a>
+                        {% endif %}
+                    
+                        <a class="navbar-toggler nav-link px-2" href="#" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation"><i class="fa-solid fa-bars fa-2x"></i></a>
+                    </div>
+                </div>
+            </nav>
+        {% endif %}
+
+        <main>
+            {% if usesidebar is defined and usesidebar %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <sidebar>
+                        <div>
+                            <span>GENERALE</span>
+                            
+                            <a href="{{ path('app_admin_user') }}" title="Utilisateurs">
+                                <i class="fas fa-user fa-fw"></i>
+                                <span>Utilisateurs</span>
+                            </a>
+
+                            <a href="{{ path('app_admin_project') }}" title="Projets">
+                                <i class="fas fa-building fa-fw"></i>
+                                <span>Projets</span>
+                            </a>
+                      </div>
+                    </sidebar>
+                {% endif %}
+          {% endif %}
+
+          <content>
+            {% block body %}
+            {% endblock %}
+          </content>
+        </main>
+
+        <div id="mymodal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">INFORMATION</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="framemodal" frameborder=0 width="100%" height="600px"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </body>
+
+    {% block localscript %}
+    {% endblock %}
+</html>
