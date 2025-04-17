@@ -17,11 +17,13 @@ class GitService
 {
     private string $uploadBasePath;
     private LoggerInterface $logger;
-
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
+    private CorpusService $corpusService;
+    
+    public function __construct(ParameterBagInterface $params, LoggerInterface $logger, CorpusService $corpusService)
     {
         $this->uploadBasePath = $params->get('kernel.project_dir').'/uploads/';
         $this->logger = $logger;
+        $this->corpusService = $corpusService;
     }
 
 
@@ -62,6 +64,14 @@ class GitService
             throw new ProcessFailedException($process);
         }
 
+        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($projectPath));
+        foreach ($rii as $file) {
+            if ($file->isFile() && $file->getExtension() === 'html') {
+                $this->handleHtmlFile($project,$projectPath,$file->getPathname());
+            }
+        }
+        exit;
+
         $this->logger->info("Dépôt cloné avec succès dans {$projectPath}");
         return true;
     }
@@ -70,12 +80,14 @@ class GitService
     {
         $filesystem = new Filesystem();
         $projectPath = $this->getProjectPath($project->getId());
-        try {
-            $filesystem->remove($projectPath);
-        } catch (IOExceptionInterface $exception) {
-            throw new BadRequestHttpException("Erreur lors de la suppression du répertoire: " . $exception->getMessage());
-        }  
-        
+        if (is_dir($projectPath . '/.git')) {
+            try {
+                $filesystem->remove($projectPath);
+            } catch (IOExceptionInterface $exception) {
+                throw new BadRequestHttpException("Erreur lors de la suppression du répertoire: " . $exception->getMessage());
+            }  
+        }
+
         return $this->cloneRepository($project);
     }
 
@@ -107,4 +119,10 @@ class GitService
 
         return $projectPath;
     }
+
+    private function handleHtmlFile(Project $project,string $projectPath, string $filePath): void
+    {
+        $this->corpusService->indexCorpus($project, $projectPath, $filePath);
+    }
+    
 }

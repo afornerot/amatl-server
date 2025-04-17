@@ -108,6 +108,20 @@ class ProjectController extends AbstractController
         ]);
     }
 
+
+    #[Route('/admin/project/reclone/{id}', name: 'app_admin_project_reclone')]
+    public function reclone(int $id, EntityManagerInterface $em): Response
+    {
+        $project = $em->getRepository(Project::class)->find($id);
+        if (!$project) {
+            return $this->redirectToRoute('app_admin_project');
+        }
+
+        $this->gitService->recloneRepository($project);
+
+        return $this->redirectToRoute('app_admin_project');
+    }
+
     #[Route('/admin/project/delete/{id}', name: 'app_admin_project_delete')]
     public function delete(int $id, EntityManagerInterface $em): Response
     {

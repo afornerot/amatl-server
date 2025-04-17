@@ -12,6 +12,9 @@ parameters:
   casMail: "%env(resolve:CAS_MAIL)%"
   casLastname: "%env(resolve:CAS_LASTNAME)%"
   casFirstname: "%env(resolve:CAS_FIRSTNAME)%"
+  corpusUrl: "%env(resolve:CORPUS_URL)%"
+  corpusUsername: "%env(resolve:CORPUS_USERNAME)%"
+  corpusPassword: "%env(resolve:CORPUS_PASSWORD)%"
 
 
 services:

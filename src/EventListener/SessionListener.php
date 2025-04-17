@@ -40,7 +40,7 @@ final class SessionListener
             $session->set('projects', $user->getProjects());
 
             $currentPath = $request->getPathInfo();
-            $noProjectPath = $this->router->generate('app_user_noproject');
+            $noProjectPath = $this->router->generate('app_noproject');
             if (!$user->getProject() && 0 === stripos($currentPath, 'noproject')) {
                 $event->setResponse(new RedirectResponse($noProjectPath));
             }

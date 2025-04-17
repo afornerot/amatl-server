@@ -103,7 +103,7 @@
                 {% endif %}
           {% endif %}
 
-          <content>
+          <content style="margin: 0px auto; {{ (maxwidth is defined ? "max-width:"~maxwidth~"px;":"") }}">
             {% block body %}
             {% endblock %}
           </content>

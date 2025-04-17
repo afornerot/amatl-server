@@ -25,14 +25,14 @@ class HomeController extends AbstractController
     public function home(Request $request, DocumentRepository $documentRepository): Response
     {
         $project = $request->getSession()->get('project');
-        if(!$project) {
+        if (!$project) {
             return $this->noproject();
         }
         $this->gitService->cloneRepository($project);
         $doc = $request->query->get('doc'); // Récupérer le paramètre doc
 
-        $files=$this->projectService->list($project->getId());
-        $readmes = ["/README.html", "/Readme.html", "readme.html"];
+        $files = $this->projectService->list($project->getId());
+        $readmes = ['/README.html', '/Readme.html', 'readme.html'];
         $readme = false;
         foreach ($readmes as $target) {
             if (($key = array_search($target, $files, true)) !== false) {
@@ -41,8 +41,8 @@ class HomeController extends AbstractController
             }
         }
 
-        if(!$doc) {
-            $doc=$readme;
+        if (!$doc) {
+            $doc = $readme;
         }
 
         return $this->render('home/home.html.twig', [
@@ -50,7 +50,7 @@ class HomeController extends AbstractController
             'usesidebar' => false,
             'projectId' => $project->getId(),
             'projectUuid' => $project->getUuid(),
-            'files'=> $files,
+            'files' => $files,
             'doc' => $doc,
         ]);
     }
@@ -64,7 +64,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/user/noproject', name: 'app_user_noproject')]
+    #[Route('/noproject', name: 'app_noproject')]
     public function noproject(): Response
     {
         return $this->render('home/noproject.html.twig', [
