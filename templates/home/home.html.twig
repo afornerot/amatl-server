@@ -12,6 +12,21 @@
         .file-link {
             font-size:75%;
         }
+
+        #toc {
+            width:300px;
+            overflow-y:auto;
+        }
+
+        #toc p {
+            margin-bottom:0px;
+            font-size:12px;
+            padding-left:10px;
+        }
+        #toc h5 {
+            padding-left:10px;
+        }
+
     </style>
 {% endblock %}
 
@@ -23,19 +38,43 @@
             <div class="flex-grow-1">
                 {{ macros.file_tree(files, projectId, '', 0) }}
             </div>
+
+            <div id="search-bar" class="my-3">
+                <div class="input-group align-items-center">
+                    <input type="text" id="search-input" class="form-control border-0 border-bottom" placeholder="Rechercher..." />
+
+                    <button class="btn btn-link text-secondary" type="button" id="search-prev" title="Précédent">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-link text-secondary" type="button" id="search-next" title="Suivant">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="btn btn-link text-danger" type="button" id="search-clear" title="Effacer">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        
             <div style="zoom:60%">projectID = {{ projectUuid }} </div>
         </div>
         <div id="file-viewer" style="flex-grow: 1; padding: 10px; background-color: #fff">
             <iframe id="preview-frame" style="width: 100%; height: 600px; border: none;"></iframe>
         </div>
+        <div id="toc"></div>
+
     </div>
 
     <script>
+//-- Ajustement à la taille de la windows ---------------------------------------------------------------------------------------
         function adjustIframeHeight() {
             let iframe = document.getElementById("preview-frame");
             iframe.style.height = window.innerHeight - iframe.offsetTop - 20+ "px";
+
+            let toc = document.getElementById("toc");
+            toc.style.height = window.innerHeight - toc.offsetTop - 20+ "px";            
         }
 
+//-- Affichage de l'iframe ------------------------------------------------------------------------------------------------------
         document.addEventListener("DOMContentLoaded", function () {
             adjustIframeHeight();
             window.addEventListener("resize", adjustIframeHeight);
@@ -81,6 +120,149 @@
                     }
                 }                
             {% endif %}
+        });
+
+//-- Récupération du TOC --------------------------------------------------------------------------------------------------------
+        const iframe = document.getElementById("preview-frame");
+        // Attendre que le contenu soit chargé
+        iframe.onload = () => {
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const tocElement = iframeDocument.querySelector('.toc');
+                const tocContainer = document.getElementById('toc');
+
+                if (tocElement) {
+                    // Par exemple, log le HTML de la TOC
+                    console.log('TOC trouvée');
+                    tocContainer.innerHTML = '<h5>Table des Matières</h5>'+tocElement.innerHTML;
+                    // Tu peux aussi copier, manipuler, cloner, etc.
+                    // const cloned = tocElement.cloneNode(true);
+                    // document.body.appendChild(cloned);
+                } else {
+                    tocContainer.innerHTML = '';
+                    console.log('Pas de .toc trouvée dans l’iframe');
+                }
+            } catch (e) {
+                console.error('Impossible d’accéder au contenu de l’iframe :', e);
+            }
+        }; 
+
+        document.getElementById('toc').addEventListener('click', function(event) {
+            const target = event.target.closest('a');
+            if (!target) return;
+
+            const href = target.getAttribute('href');
+            if (!href.startsWith('#')) return; // ignore les liens externes
+
+            event.preventDefault();
+
+            const iframe = document.getElementById('preview-frame');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const targetEl = iframeDoc.querySelector(href); // ex: #section2
+
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+//-- Zone de Recherche ----------------------------------------------------------------------------------------------------------
+        let currentMatchIndex = 0;
+        let matches = [];
+
+        function clearHighlights(iframeDoc) {
+            const highlights = iframeDoc.querySelectorAll('.iframe-highlight');
+            highlights.forEach(el => {
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize(); // fusionne les nœuds texte
+            });
+            matches = [];
+            currentMatchIndex = 0;
+        }
+
+        function highlightMatches(iframeDoc, query) {
+            if (!query) return;
+
+            const walker = iframeDoc.createTreeWalker(
+                iframeDoc.body,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const regex = new RegExp(query, 'gi');
+            while (walker.nextNode()) {
+                const node = walker.currentNode;
+                const match = regex.exec(node.textContent);
+                if (match) {
+                    const span = iframeDoc.createElement('span');
+                    span.className = 'iframe-highlight';
+                    span.style.backgroundColor = 'yellow';
+                    const matchText = node.splitText(match.index);
+                    const after = matchText.splitText(match[0].length);
+                    const clone = matchText.cloneNode(true);
+                    span.appendChild(clone);
+                    matchText.parentNode.replaceChild(span, matchText);
+                    matches.push(span);
+                }
+            }
+        }
+
+        function scrollToMatch(index) {
+            if (matches.length === 0) return;
+
+            matches.forEach(el => el.style.outline = '');
+            const el = matches[index];
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.outline = '2px solid red';
+        }
+
+        function searchInIframe() {
+            const iframe = document.getElementById('preview-frame');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const query = document.getElementById('search-input').value.trim();
+
+            clearHighlights(iframeDoc);
+            matches = [];
+            currentMatchIndex = 0;
+
+            if (query.length >= 3) {
+                highlightMatches(iframeDoc, query);
+                if (matches.length > 0) {
+                    scrollToMatch(0);
+                }
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', () => {
+            searchInIframe();
+        });
+
+        document.getElementById('search-next').addEventListener('click', () => {
+            if (matches.length === 0) return;
+            currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+            scrollToMatch(currentMatchIndex);
+        });
+
+        document.getElementById('search-prev').addEventListener('click', () => {
+            if (matches.length === 0) return;
+            currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
+            scrollToMatch(currentMatchIndex);
+        });
+
+        document.getElementById('search-clear').addEventListener('click', () => {
+            const iframe = document.getElementById('preview-frame');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+            // Vider le champ de recherche
+            document.getElementById('search-input').value = '';
+
+            // Nettoyer les surlignages
+            clearHighlights(iframeDoc);
+
+            // Réinitialiser état interne
+            matches = [];
+            currentMatchIndex = 0;
         });
     </script>
 {% endblock %}
