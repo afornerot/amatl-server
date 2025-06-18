@@ -10,7 +10,7 @@
                 <table class="table table-striped table-bordered table-hover" id="dataTables" style="width:100%">
                     <thead>
                     <tr>
-                        <th width="70px" class="no-sort">Action</th>
+                        <th width="100px" class="no-sort">Action</th>
                         <th width="70px">Logo</th>
                         <th>Nom</th>
                     </tr>
@@ -18,7 +18,10 @@
                     <tbody>
                         {% for project in projects %}
                             <tr>
-                                <td><a href="{{ path(routeupdate,{id:project.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
+                                <td>
+                                    <a href="{{ path(routeupdate,{id:project.id}) }}" class="me-2"><i class="fas fa-file fa-2x"></i></a>
+                                    <a href="{{ path('app_admin_project_reclone',{id:project.id}) }}" onclick="return confirm('Es-tu sûr de vouloir reinitialiser et reindexer le projet ?');"><i class="fas fa-rotate-right fa-2x"></i></a>
+                                </td>
                                 <td><img class="avatar" src="{{ asset(project.logo)}}"></td>
                                 <td>{{project.title}}</td>
                             </tr>

@@ -70,6 +70,7 @@
                             {% if is_granted('ROLE_ADMIN') %}
                                 <a class="nav-link px-2" href="{{path('app_admin')}}"><i class="fa-solid fa-cog fa-2x"></i></a>
                             {% endif %}
+                            <a class="nav-link px-2" href="{{path('app_corpus')}}"><i class="fa-solid fa-question fa-2x"></i></a>
                             <a class="nav-link px-2" href="{{path('app_user_profil')}}"><img src="{{asset(app.user.avatar)}}" class="avatar"></a>
                             <a class="nav-link px-2" href="{{path('app_logout')}}"><i class="fa-solid fa-right-from-bracket fa-2x"></i></a>
                         {% else %}

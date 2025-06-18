@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Project;
 use GuzzleHttp\Client;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class CorpusService
 {
@@ -69,7 +70,65 @@ class CorpusService
 
             return json_decode($body, true);
         } catch (\Throwable $e) {
-            return ['error' => 'Erreur lors de l’appel à Corpus'];
+            throw new BadRequestException('error corpus = '.$e->getMessage());
+        }
+    }
+
+    public function ask(Project $project, string $query): array
+    {
+        try {
+            $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/ask', [
+                'auth' => [$this->corpusUsername, $this->corpusPassword],
+                'query' => [
+                    'query' => $query,
+                    'collection' => $project->getTitle(),
+                ],
+                'headers' => [
+                    'Accept' => '*/*',
+                ],
+            ]);
+
+            $body = $response->getBody()->getContents();
+
+            return json_decode($body, true);
+        } catch (\Throwable $e) {
+            throw new BadRequestException('error corpus = '.$e->getMessage());
+        }
+    }
+
+    public function tasks(): array
+    {
+        try {
+            $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/tasks', [
+                'auth' => [$this->corpusUsername, $this->corpusPassword],
+                'headers' => [
+                    'Accept' => '*/*',
+                ],
+            ]);
+
+            $body = $response->getBody()->getContents();
+
+            return json_decode($body, true);
+        } catch (\Throwable $e) {
+            throw new BadRequestException('error corpus = '.$e->getMessage());
+        }
+    }
+
+    public function task($id): array
+    {
+        try {
+            $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/tasks/'.$id, [
+                'auth' => [$this->corpusUsername, $this->corpusPassword],
+                'headers' => [
+                    'Accept' => '*/*',
+                ],
+            ]);
+
+            $body = $response->getBody()->getContents();
+
+            return json_decode($body, true);
+        } catch (\Throwable $e) {
+            throw new BadRequestException('error corpus = '.$e->getMessage());
         }
     }
 }

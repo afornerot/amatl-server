@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Tâches CORPUS</h1>
+    <a href="{{ path("app_corpus_task") }}" class="btn btn-success mb-3">Refresh</a>
+
+    <div class="dataTable_wrapper">
+        <table class="table table-striped table-bordered table-hover" id="dataTables" style="width:100%">
+            <thead>
+            <tr>
+                <td>id</td>
+                <td>status</td>
+                <td>progress</td>
+                <td>scheduledAt</td>
+                <td>finishedAt</td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks.tasks %}
+                    <tr>
+                        <td>{{task.id}}</td>
+                        <td>{{task.status}}</td>
+                        <td>{{task.progress}}</td>
+                        <td>{{task.scheduledAt}}</td>
+                        <td>{{task.finishedAt}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        $(document).ready(function() {
+            $('#dataTables').DataTable({
+                columnDefs: [ { "targets": "no-sort", "orderable": false }, { "targets": "no-string", "type" : "num" } ],
+                responsive: true,
+                iDisplayLength: 100,
+                order: [[ 1, "asc" ]]
+            });
+        });
+    </script>
+{% endblock %}
