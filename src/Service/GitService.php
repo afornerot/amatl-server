@@ -62,12 +62,7 @@ class GitService
             throw new ProcessFailedException($process);
         }
 
-        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($projectPath));
-        foreach ($rii as $file) {
-            if ($file->isFile() && 'html' === $file->getExtension()) {
-                $this->handleHtmlFile($project, $projectPath, $file->getPathname());
-            }
-        }
+        $this->reindexCorpus($project);
 
         $this->logger->info("Dépôt cloné avec succès dans {$projectPath}");
 
@@ -87,6 +82,19 @@ class GitService
         }
 
         return $this->cloneRepository($project);
+    }
+
+    public function reindexCorpus(Project $project): bool
+    {
+        $projectPath = $this->getProjectPath($project->getId());
+        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($projectPath));
+        foreach ($rii as $file) {
+            if ($file->isFile() && 'html' === $file->getExtension()) {
+                $this->handleHtmlFile($project, $projectPath, $file->getPathname());
+            }
+        }
+
+        return true;
     }
 
     public function updateRepository(Project $project): bool
@@ -109,6 +117,28 @@ class GitService
 
         $this->logger->info("Dépôt mis à jour avec succès pour le projet {$project->getId()}");
 
+        $checkProcess = new Process(['git', '-C', $projectPath, 'rev-parse', '--verify', 'HEAD@{1}']);
+        $checkProcess->run();
+        $htmlFiles = [];
+
+        if ($checkProcess->isSuccessful()) {
+            // HEAD@{1} existe, on peut diff
+            $diffProcess = new Process(['git', '-C', $projectPath, 'diff', '--name-only', 'HEAD@{1}', 'HEAD']);
+            $diffProcess->run();
+
+            if (!$diffProcess->isSuccessful()) {
+                $this->logger->error('Erreur lors du diff : '.$diffProcess->getErrorOutput());
+                throw new ProcessFailedException($diffProcess);
+            }
+
+            $output = $diffProcess->getOutput();
+            $htmlFiles = array_filter(explode("\n", trim($output)), fn ($f) => '.html' === substr($f, -5));
+        }
+
+        foreach ($htmlFiles as $relativePath) {
+            $this->handleHtmlFile($project, $projectPath, $relativePath);
+        }
+
         return true;
     }
 
@@ -121,6 +151,8 @@ class GitService
 
     private function handleHtmlFile(Project $project, string $projectPath, string $filePath): void
     {
-        $this->corpusService->indexCorpus($project, $projectPath, $filePath);
+        $this->logger->info('⏳ Index corpus en cours = '.$filePath);
+        $return = $this->corpusService->indexCorpus($project, $projectPath, $filePath);
+        $this->logger->info($return);
     }
 }

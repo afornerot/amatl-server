@@ -22,7 +22,7 @@
                         <td>{{task.status}}</td>
                         <td>{{task.progress}}</td>
                         <td>{{task.scheduledAt}}</td>
-                        <td>{{task.finishedAt}}</td>
+                        <td>{{task.finishedAt is defined?task.finishedAt:''}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -37,7 +37,7 @@
                 columnDefs: [ { "targets": "no-sort", "orderable": false }, { "targets": "no-string", "type" : "num" } ],
                 responsive: true,
                 iDisplayLength: 100,
-                order: [[ 1, "asc" ]]
+                order: [[ 2, "desc" ]]
             });
         });
     </script>

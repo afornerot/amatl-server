@@ -4,22 +4,27 @@ namespace App\Service;
 
 use App\Entity\Project;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class CorpusService
 {
     private Client $client;
+    private string $corpusInstance;
     private string $corpusUrl;
     private string $corpusUsername;
     private string $corpusPassword;
+    private LoggerInterface $logger;
 
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
-        $this->client = new Client(); // Tu peux aussi l'injecter via le container
+        $this->client = new Client();
+        $this->corpusInstance = $params->get('corpusInstance').'-';
         $this->corpusUrl = $params->get('corpusUrl');
         $this->corpusUsername = $params->get('corpusUsername');
         $this->corpusPassword = $params->get('corpusPassword');
+        $this->logger = $logger;
     }
 
     public function indexCorpus(Project $project, string $projectPath, string $filePath): bool
@@ -28,13 +33,15 @@ class CorpusService
             throw new \InvalidArgumentException("Fichier introuvable: $filePath");
         }
 
+        $this->logger->info($this->corpusUrl.'/api/v1/index');
+
         $sourceUrl = str_replace($projectPath, '', $filePath);
         $response = $this->client->request('POST', $this->corpusUrl.'/api/v1/index', [
             'auth' => [$this->corpusUsername, $this->corpusPassword],
             'multipart' => [
                 [
                     'name' => 'collection',
-                    'contents' => $project->getTitle(),
+                    'contents' => $this->corpusInstance.$project->getTitle(),
                 ],
                 [
                     'name' => 'file',
@@ -59,7 +66,7 @@ class CorpusService
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
                 'query' => [
                     'query' => $query,
-                    'collection' => $project->getTitle(),
+                    'collection' => $this->corpusInstance.$project->getTitle(),
                 ],
                 'headers' => [
                     'Accept' => '*/*',
@@ -81,7 +88,7 @@ class CorpusService
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
                 'query' => [
                     'query' => $query,
-                    'collection' => $project->getTitle(),
+                    'collection' => $this->corpusInstance.$project->getTitle(),
                 ],
                 'headers' => [
                     'Accept' => '*/*',
@@ -89,6 +96,7 @@ class CorpusService
             ]);
 
             $body = $response->getBody()->getContents();
+            dump($body);
 
             return json_decode($body, true);
         } catch (\Throwable $e) {

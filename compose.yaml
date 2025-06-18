@@ -32,7 +32,7 @@ services:
     ports:
       - 6088:8080
   corpus:
-    image: ghcr.io/bornholm/corpus:latest
+    image: ghcr.io/bornholm/corpus-server:latest
     container_name: corpus
     restart: unless-stopped
     ports:
@@ -43,7 +43,6 @@ services:
       - CORPUS_LLM_PROVIDER_BASE_URL=https://api.mistral.ai/v1/
       - CORPUS_LLM_PROVIDER_CHAT_COMPLETION_MODEL=mistral-small-latest
       - CORPUS_LLM_PROVIDER_EMBEDDINGS_MODEL=mistral-embed
-      - CORPUS_LLM_PROVIDER_KEY=changeme
       - CORPUS_HTTP_AUTH_WRITER_USERNAME=writer
       - CORPUS_HTTP_AUTH_WRITER_PASSWORD=changeme
       - CORPUS_LOGGER_LEVEL=-4
