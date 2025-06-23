@@ -23,8 +23,13 @@ services:
     ports:
       - "8008:80"
     volumes:
-      - .:/app:delegated
-
+      - ./config:/app/config:delegated
+      - ./src:/app/src:delegated
+      - ./templates:/app/templates:delegated
+      - ./public:/app/public:delegated
+      - ./uploads:/app/uploads:delegated
+      - ./.env:/app/.env:delegated
+      - ./.env.local:/app/.env.local:delegated
   adminer:
     image: adminer
     container_name: amatl-adminer

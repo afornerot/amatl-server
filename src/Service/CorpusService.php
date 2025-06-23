@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 class CorpusService
 {
     private Client $client;
+    private bool $corpusActivate;
     private string $corpusInstance;
     private string $corpusUrl;
     private string $corpusUsername;
@@ -20,6 +21,7 @@ class CorpusService
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
         $this->client = new Client();
+        $this->corpusActivate = $params->get('corpusActivate');
         $this->corpusInstance = $params->get('corpusInstance').'-';
         $this->corpusUrl = $params->get('corpusUrl');
         $this->corpusUsername = $params->get('corpusUsername');
@@ -29,6 +31,10 @@ class CorpusService
 
     public function indexCorpus(Project $project, string $projectPath, string $filePath): bool
     {
+        if (!$this->corpusActivate) {
+            return true;
+        }
+
         if (!file_exists($filePath)) {
             throw new \InvalidArgumentException("Fichier introuvable: $filePath");
         }
@@ -61,6 +67,10 @@ class CorpusService
 
     public function search(Project $project, string $query): array
     {
+        if (!$this->corpusActivate) {
+            return [];
+        }
+
         try {
             $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/search', [
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
@@ -83,6 +93,10 @@ class CorpusService
 
     public function ask(Project $project, string $query): array
     {
+        if (!$this->corpusActivate) {
+            return [];
+        }
+
         try {
             $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/ask', [
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
@@ -96,7 +110,6 @@ class CorpusService
             ]);
 
             $body = $response->getBody()->getContents();
-            dump($body);
 
             return json_decode($body, true);
         } catch (\Throwable $e) {
@@ -106,6 +119,10 @@ class CorpusService
 
     public function tasks(): array
     {
+        if (!$this->corpusActivate) {
+            return [];
+        }
+
         try {
             $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/tasks', [
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
@@ -124,6 +141,10 @@ class CorpusService
 
     public function task($id): array
     {
+        if (!$this->corpusActivate) {
+            return [];
+        }
+
         try {
             $response = $this->client->request('GET', $this->corpusUrl.'/api/v1/tasks/'.$id, [
                 'auth' => [$this->corpusUsername, $this->corpusPassword],
