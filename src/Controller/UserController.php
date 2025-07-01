@@ -163,7 +163,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/user/selectproject', name: 'app_user_selectproject')]
+    #[Route('/user/selectproject', name: 'app_user_selectproject')]
     public function selectproject(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $id = $request->get('id');
@@ -180,12 +180,12 @@ class UserController extends AbstractController
 
         $projects = $user->getProjects();
         if (!$projects->contains($project)) {
-            return new JsonResponse(['status' => 'KO', 'message' => 'Compangnie non autorisée'], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['status' => 'KO', 'message' => 'Projet non autorisée'], Response::HTTP_FORBIDDEN);
         }
 
         $user->setProject($project);
         $em->flush();
 
-        return new JsonResponse(['status' => 'OK', 'message' => 'Compangnie selectionnée'], Response::HTTP_OK);
+        return new JsonResponse(['status' => 'OK', 'message' => 'Projet selectionnée'], Response::HTTP_OK);
     }
 }

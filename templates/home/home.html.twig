@@ -20,7 +20,9 @@
 
         #toc {
             padding-left:10px;
+            flex-grow: 1
         }
+
         #toc p, #toc a {
             margin-bottom:0px;
             font-size:12px;
@@ -59,7 +61,7 @@
         <div id="file-viewer" style="flex-grow: 1; padding: 10px; background-color: #fff">
             <iframe id="preview-frame" style="width: 100%; height: 600px; border: none;"></iframe>
         </div>
-        <div id="rightbar">
+        <div id="rightbar" class="d-flex flex-column">
             <div id="zoom-controls">
                 <div class="input-group justify-content-center" style="margin:auto">
                     <button class="btn btn-link text-secondary" type="button" id="zoom-out" title="Zoom -">
@@ -74,7 +76,17 @@
                 </div>
             </div>
             <div id="toc">
-            </div>        
+            </div>  
+
+            <div id="download" style="text-align:center">
+                <a id="linkmd" href="" class="btn btn-outline-primary" style="width:190px">
+                <i class="fas fa-file-alt me-1"></i> Télécharger le .MD
+                </a>
+
+                <a id="linkpdf" href="" class="btn btn-outline-danger" style="width:190px">
+                <i class="fas fa-file-pdf me-1"></i> Télécharger le PDF
+                </a>
+            </div>      
         </div>
 
     </div>
@@ -117,12 +129,27 @@
                     let newUrl = new URL(window.location);
                     newUrl.searchParams.set("doc", filePath);
                     history.pushState({}, "", newUrl);   
+                    
+                    // Mise à jour des liens de download
+                    url = "{{ path('download_file', {type: 'pdf', idProject: projectId, filePath: 'xxx' }) }}";
+                    url=url.replace('xxx',filePath);
+                    $("#linkpdf").attr("href",url);
+
+                    url = "{{ path('download_file', {type: 'md', idProject: projectId, filePath: 'xxx' }) }}";
+                    url=url.replace('xxx',filePath);
+                    $("#linkmd").attr("href",url);
                 });
             });
 
             {% if doc %}
                 let url = "{{ path('view_file', { idProject: projectId, filePath: doc }) }}";
                 document.getElementById("preview-frame").src = url;
+
+                url = "{{ path('download_file', {type: 'pdf', idProject: projectId, filePath: doc }) }}";
+                $("#linkpdf").attr("href",url);
+
+                url = "{{ path('download_file', {type: 'md', idProject: projectId, filePath: doc }) }}";
+                $("#linkmd").attr("href",url);
 
                 let fileElement = document.querySelector(`[data-file-path="{{doc}}"]`);
                 if (fileElement) {
@@ -287,49 +314,54 @@
         });
 
 //-- Zoom -----------------------------------------------------------------------------------------------------------------------
-    let zoomLevel = parseFloat(localStorage.getItem('iframeZoom')) || 1.0;
-    const zoomStep = 0.1;
-    const minZoom = 0.5;
-    const maxZoom = 3.0;
+        let zoomLevel = parseFloat(localStorage.getItem('iframeZoom')) || 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.5;
+        const maxZoom = 3.0;
 
-    function setIframeZoom(level) {
-    const iframe = document.getElementById('preview-frame');
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (!iframeDoc) return;
+        function setIframeZoom(level) {
+        const iframe = document.getElementById('preview-frame');
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!iframeDoc) return;
 
-    let styleTag = iframeDoc.getElementById('zoom-style');
-    if (!styleTag) {
-        styleTag = iframeDoc.createElement('style');
-        styleTag.id = 'zoom-style';
-        iframeDoc.head.appendChild(styleTag);
-    }
-    styleTag.textContent = `body { zoom: ${level}; }`;
+        let styleTag = iframeDoc.getElementById('zoom-style');
+        if (!styleTag) {
+            styleTag = iframeDoc.createElement('style');
+            styleTag.id = 'zoom-style';
+            iframeDoc.head.appendChild(styleTag);
+        }
+        styleTag.textContent = `body { zoom: ${level}; }`;
 
-    // Sauvegarde dans localStorage
-    localStorage.setItem('iframeZoom', level);
-    }
+        // Sauvegarde dans localStorage
+        localStorage.setItem('iframeZoom', level);
+        }
 
-    // Appliquer le zoom initial au chargement
-    window.addEventListener('load', () => {
-        setIframeZoom(zoomLevel);
-    });
+        // Appliquer le zoom initial au chargement
+        window.addEventListener('load', () => {
+            setIframeZoom(zoomLevel);
+        });
 
-    document.getElementById('zoom-in').addEventListener('click', () => {
-        zoomLevel = Math.min(maxZoom, zoomLevel + zoomStep);
-        setIframeZoom(zoomLevel);
-    });
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            zoomLevel = Math.min(maxZoom, zoomLevel + zoomStep);
+            setIframeZoom(zoomLevel);
+        });
 
-    document.getElementById('zoom-out').addEventListener('click', () => {
-        zoomLevel = Math.max(minZoom, zoomLevel - zoomStep);
-        setIframeZoom(zoomLevel);
-    });
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            zoomLevel = Math.max(minZoom, zoomLevel - zoomStep);
+            setIframeZoom(zoomLevel);
+        });
 
-    document.getElementById('zoom-reset').addEventListener('click', () => {
-        zoomLevel = 1.0;
-        setIframeZoom(zoomLevel);
-    });
+        document.getElementById('zoom-reset').addEventListener('click', () => {
+            zoomLevel = 1.0;
+            setIframeZoom(zoomLevel);
+        });
 
-
+//-- Download PDF / HTML --------------------------------------------------------------------------------------------------------
+        function btnPDF(src) {
+            console.log(src);
+            console.log("==============================");
+            
+        }
     </script>
 {% endblock %}
 

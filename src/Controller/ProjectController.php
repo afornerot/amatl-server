@@ -10,8 +10,10 @@ use App\Service\GitService;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ProjectController extends AbstractController
@@ -108,7 +110,6 @@ class ProjectController extends AbstractController
         ]);
     }
 
-
     #[Route('/admin/project/reclone/{id}', name: 'app_admin_project_reclone')]
     public function reclone(int $id, EntityManagerInterface $em): Response
     {
@@ -174,5 +175,28 @@ class ProjectController extends AbstractController
         $htmlContent = file_get_contents($fullPath);
 
         return new Response($htmlContent);
+    }
+
+    #[Route('/user/download/{type}/{idProject}/{filePath}', name: 'download_file', requirements: ['filePath' => '.+'])]
+    public function downloadFile(string $type, int $idProject, string $filePath, EntityManagerInterface $em): BinaryFileResponse
+    {
+        $project = $em->getRepository(Project::class)->find($idProject);
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('L\'utilisateur doit être une instance de User.');
+        }
+
+        if (!$project || !$user->getProjects()->contains($project)) {
+            throw $this->createAccessDeniedException('Vous ne disposez pas des droits pour visualiser ce document.');
+        }
+
+        $basePath = $this->getParameter('kernel.project_dir')."/uploads/{$idProject}/";
+        $fullPath = str_replace('.html', '.'.$type, realpath($basePath.$filePath));
+        if (!file_exists($fullPath)) {
+            throw $this->createNotFoundException('Fichier introuvable');
+        }
+
+        return (new BinaryFileResponse($fullPath))
+            ->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($fullPath));
     }
 }
