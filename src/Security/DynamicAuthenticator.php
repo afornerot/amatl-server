@@ -95,12 +95,15 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     private function authenticateWithCas(Request $request): Passport
     {
-        // Récupérer l'hôte d'origine derrière le reverse proxy
-        $host = $request->headers->get('X-Forwarded-Host') ?? $request->getHost().($request->getPort() ? ':'.$request->getPort() : '');
-        $scheme = $request->headers->get('X-Forwarded-Proto') ?? $request->getScheme();
+        $forwardedHost = $request->headers->get('X-Forwarded-Host');
+        $forwardedPort = $request->headers->get('X-Forwarded-Port');
+        $forwardedProto = $request->headers->get('X-Forwarded-Proto');
 
-        // Construire l'URL
-        $url = $scheme.'://'.$host;
+        $host = $forwardedHost ?? $request->getHost();
+        $port = $forwardedPort ?? $request->getPort();
+        $scheme = $forwardedProto ?? $request->getScheme();
+
+        $url = $scheme.'://'.$host.':'.$port;
 
         // \phpCAS::setDebug('/tmp/logcas.log');
         \phpCAS::client(CAS_VERSION_2_0, $this->parameterBag->get('casHost'), (int) $this->parameterBag->get('casPort'), $this->parameterBag->get('casPath'), $url, false);
