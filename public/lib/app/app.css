@@ -9,16 +9,16 @@ body {
     align-items: stretch;
 }
 
-.avatar{
+.avatar {
     border-radius: 100%;
-    width:35px;
-    height:35px;
+    width: 35px;
+    height: 35px;
 }
 
-.bigavatar{
+.bigavatar {
     border-radius: 100%;
-    width:100px;
-    height:100px;
+    width: 100px;
+    height: 100px;
 }
 
 .navbar-brand img {
@@ -69,6 +69,11 @@ content {
     flex-grow: 1;
     align-items: stretch;
     padding: 15px;
+}
+
+.toc,
+#toc {
+    list-style: none;
 }
 
 @media (max-width: 991px) {
