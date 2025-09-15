@@ -45,6 +45,14 @@ class HomeController extends AbstractController
             $doc = $readme;
         }
 
+        $baseDir = $this->getParameter('kernel.project_dir').'/public/uploads/schemaspy';
+        $schemaDir = $baseDir.'/'.$project->getId();
+        if (!is_dir($schemaDir)) {
+            $schemaDir = null;
+        } else {
+            $schemaDir = '/uploads/schemaspy/'.$project->getId();
+        }
+
         return $this->render('home/home.html.twig', [
             'usemenu' => true,
             'usesidebar' => false,
@@ -52,6 +60,7 @@ class HomeController extends AbstractController
             'projectUuid' => $project->getUuid(),
             'files' => $files,
             'doc' => $doc,
+            'schemaDir' => $schemaDir,
         ]);
     }
 

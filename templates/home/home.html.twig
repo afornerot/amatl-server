@@ -40,6 +40,11 @@
                 {{ macros.file_tree(files, projectId, '', 0) }}
             </div>
 
+            {% if schemaDir %}
+                <div id="mcd-bar" class="my-3">    
+                    <a href="{{schemaDir~'/index.html'}}" target="_blank"><i class='fas fa-database fa-2x me-2'></i><span style="font-size: 25px">MCD</span></a>
+                </div>
+            {% endif %}
             <div id="search-bar" class="my-3">
                 <div class="input-group align-items-center">
                     <input type="text" id="search-input" class="form-control border-0 border-bottom" placeholder="Rechercher..." />
