@@ -1,0 +1,1 @@
+misc/script/amatl render --config uploads/project/1/misc/amatl/config.yml pdf -o uploads/project/1/README.pdf uploads/project/1/README.md
