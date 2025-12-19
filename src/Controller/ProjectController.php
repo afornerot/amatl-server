@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Entity\User;
+use App\Dto\Markdown;
+use App\Form\EditorType;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
 use App\Service\GitService;
@@ -164,7 +166,7 @@ class ProjectController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne disposez pas des droits pour visualiser ce document.');
         }
 
-        $basePath = $this->getParameter('kernel.project_dir')."/uploads/{$idProject}/";
+        $basePath = $this->getParameter('kernel.project_dir')."/uploads/project/{$idProject}/";
         $fullPath = realpath($basePath.$filePath);
 
         // Vérification de sécurité : s'assurer que le fichier est bien dans le dossier du projet
@@ -190,7 +192,7 @@ class ProjectController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne disposez pas des droits pour visualiser ce document.');
         }
 
-        $basePath = $this->getParameter('kernel.project_dir')."/uploads/{$idProject}/";
+        $basePath = $this->getParameter('kernel.project_dir')."/uploads/project/{$idProject}/";
         $fullPath = str_replace('.html', '.'.$type, realpath($basePath.$filePath));
         if (!file_exists($fullPath)) {
             throw $this->createNotFoundException('Fichier introuvable');
@@ -198,5 +200,48 @@ class ProjectController extends AbstractController
 
         return (new BinaryFileResponse($fullPath))
             ->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($fullPath));
+    }
+
+    #[Route('/user/edit/{idProject}/{filePath}', name: 'edit_file', requirements: ['filePath' => '.+'])]
+    public function editFile(int $idProject, string $filePath, EntityManagerInterface $em, Request $request): Response
+    {
+        $project = $em->getRepository(Project::class)->find($idProject);
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('L\'utilisateur doit être une instance de User.');
+        }
+
+        if (!$project || !$user->getProjects()->contains($project)) {
+            throw $this->createAccessDeniedException('Vous ne disposez pas des droits pour visualiser ce document.');
+        }
+
+        $basePath = $this->getParameter('kernel.project_dir')."/uploads/project/{$idProject}/";
+        $fullPath = str_replace('.html', '.md', $basePath.$filePath);
+
+        if (!file_exists($fullPath)) {
+            throw $this->createNotFoundException('Fichier introuvable');
+        }
+
+        $content = file_get_contents($fullPath);
+
+        $markdown = new Markdown();
+        $markdown->setContent($content);
+
+        $form = $this->createForm(EditorType::class, $markdown);
+        $form->handleRequest($request);
+        dump($form->isSubmitted());
+        if ($form->isSubmitted() && $form->isValid()) {
+            file_put_contents($fullPath, $markdown->getContent());
+
+            return $this->redirectToRoute('app_home', ['doc' => $filePath]);
+        }
+
+        return $this->render('project/md.html.twig', [
+            'usemenu' => true,
+            'usesidebar' => false,
+            'form' => $form->createView(),
+            'project' => $project,
+            'filePath' => $filePath,
+        ]);
     }
 }

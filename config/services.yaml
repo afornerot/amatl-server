@@ -34,3 +34,6 @@ services:
   App\Security\DynamicAuthenticator:
     arguments:
       $modeAuth: '%env(MODE_AUTH)%'
+
+  App\Security\FileVoter:
+      tags: [security.voter]

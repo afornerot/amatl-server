@@ -4,3 +4,5 @@ oneup_uploader:
             frontend: dropzone
         logo:
             frontend: dropzone            
+        bninefile:
+            frontend: dropzone     

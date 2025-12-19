@@ -30,6 +30,8 @@ services:
       - ./uploads:/app/uploads:delegated
       - ./.env:/app/.env:delegated
       - ./.env.local:/app/.env.local:delegated
+      - ./../../nine-project/bnine/bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
+
   adminer:
     image: adminer
     container_name: amatl-adminer

@@ -144,7 +144,7 @@ class GitService
 
     private function getProjectPath(string $projectId): string
     {
-        $projectPath = $this->uploadBasePath.$projectId;
+        $projectPath = $this->uploadBasePath."project/".$projectId;
 
         return $projectPath;
     }

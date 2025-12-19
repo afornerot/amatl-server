@@ -15,7 +15,7 @@ class ProjectService
 
     public function getProjectDir(int $projectId): string
     {
-        return $this->uploadBasePath.$projectId.'/';
+        return $this->uploadBasePath."project/".$projectId.'/';
     }
 
     public function list(int $projectId): array

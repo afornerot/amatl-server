@@ -8,6 +8,8 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "apereo/phpcas": "^1.6",
+        "bnine/filesbundle": "^1.0",
+        "bnine/mdeditorbundle": "^1.1",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",

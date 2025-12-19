@@ -34,6 +34,7 @@
 {% import _self as macros %}
 
 {% block body %}
+
     <div class="d-flex">
         <div class="sidebar d-flex flex-column" style="width: 300px; border-right: 1px solid #ccc; padding: 10px;">
             <div class="flex-grow-1">
@@ -84,6 +85,10 @@
             </div>  
 
             <div id="download" style="text-align:center">
+                <a id="editmd" href="" class="btn btn-outline-primary" style="width:190px">
+                <i class="fas fa-file-alt me-1"></i> Modifier le .MD
+                </a>
+
                 <a id="linkmd" href="" class="btn btn-outline-primary" style="width:190px">
                 <i class="fas fa-file-alt me-1"></i> Télécharger le .MD
                 </a>
@@ -143,6 +148,11 @@
                     url = "{{ path('download_file', {type: 'md', idProject: projectId, filePath: 'xxx' }) }}";
                     url=url.replace('xxx',filePath);
                     $("#linkmd").attr("href",url);
+
+                    url = "{{ path('edit_file', {type: 'md', idProject: projectId, filePath: 'xxx' }) }}";
+                    url=url.replace('xxx',filePath);
+                    $("#editmd").attr("href",url);
+
                 });
             });
 
@@ -155,6 +165,9 @@
 
                 url = "{{ path('download_file', {type: 'md', idProject: projectId, filePath: doc }) }}";
                 $("#linkmd").attr("href",url);
+
+                url = "{{ path('edit_file', {type: 'md', idProject: projectId, filePath: doc }) }}";
+                $("#editmd").attr("href",url);
 
                 let fileElement = document.querySelector(`[data-file-path="{{doc}}"]`);
                 if (fileElement) {

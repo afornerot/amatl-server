@@ -1,12 +1,12 @@
-function ModalLoad(idmodal,title,path) {
-	$("#"+idmodal+" .modal-header h4").text(title);
-	$("#"+idmodal+" #framemodal").attr("src",path);
+function ModalLoad(idmodal, title, path) {
+	$("#" + idmodal + " .modal-header h4").text(title);
+	$("#" + idmodal + " #framemodal").attr("src", path);
 }
 
-$(document).ready(function(){
+$(document).ready(function () {
 
-	$("#selectproject").on("change", function() {
-		url=$(this).data("change");
+	$("#selectproject").on("change", function () {
+		url = $(this).data("change");
 
 		$.ajax({
 			type: "POST",
@@ -17,7 +17,7 @@ $(document).ready(function(){
 			success: function (result) {
 				location.reload();
 			}
-	   });
+		});
 
-    });
+	});
 });

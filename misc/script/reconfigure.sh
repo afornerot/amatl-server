@@ -8,6 +8,8 @@ cd ../..
 DIR=$(pwd)
 
 bin/console d:s:u --force --complete
+bin/console asset:install
+bin/console cache:clear
 bin/console app:init
 
 exec $@

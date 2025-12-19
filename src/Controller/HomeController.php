@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\DocumentRepository;
 use App\Service\GitService;
 use App\Service\ProjectService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +21,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/', name: 'app_home')]
-    public function home(Request $request, DocumentRepository $documentRepository): Response
+    public function home(Request $request): Response
     {
         $project = $request->getSession()->get('project');
         if (!$project) {
@@ -46,7 +45,7 @@ class HomeController extends AbstractController
         }
 
         $baseDir = $this->getParameter('kernel.project_dir').'/public/uploads/schemaspy';
-        $schemaDir = $baseDir.'/'.$project->getId();
+        $schemaDir = $baseDir.'/project/'.$project->getId();
         if (!is_dir($schemaDir)) {
             $schemaDir = null;
         } else {

@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="d-flex">
+        <div class="sidebar d-flex flex-column" style="width: 300px; padding-right:15px;">
+            {{ render(path("bninefiles_files", {domain: 'project', id: project.id, editable: 1})) }}
+        </div>
+
+        <div>
+            {{ form_start(form) }}
+                <h3 class="d-flex justify-content-between">
+                    <span>Édition de {{ filePath }}</span>
+                    {{ form_widget(form.submit) }}
+                </h3>
+                {{ form_widget(form.content) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
