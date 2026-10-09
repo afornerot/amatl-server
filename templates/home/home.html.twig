@@ -14,6 +14,20 @@
             overflow: hidden;
         }
         
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         content {
             padding:0px;
         }
@@ -114,7 +128,12 @@
         
             <div style="font-size: 10px;">projectID = {{ projectUuid }} </div>
         </div>
-        <div id="file-viewer" style="flex-grow: 1; padding: 10px; background-color: #fff">
+        <div id="file-viewer" style="flex-grow: 1; padding: 10px; background-color: #fff; position: relative;">
+            <div id="iframe-loading" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;display:none;z-index:10;">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+                    <div class="spinner"></div>
+                </div>
+            </div>
             <iframe id="preview-frame" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
         <div id="rightbar" class="d-flex flex-column">
@@ -166,6 +185,7 @@
                     let filePath = this.getAttribute("data-file-path");
                     let url = "{{ path('view_file', { idProject: projectId, filePath: 'xxx' }) }}";
                     url=url.replace('xxx',filePath);
+                    document.getElementById("iframe-loading").style.display = "block";
                     document.getElementById("preview-frame").src = url;
 
                     // Mettre à jour l'URL dans la barre d'adresse
@@ -185,6 +205,7 @@
             });
 
             {% if doc %}
+                document.getElementById("iframe-loading").style.display = "block";
                 let url = "{{ path('view_file', { idProject: projectId, filePath: doc }) }}";
                 document.getElementById("preview-frame").src = url;
 
@@ -232,7 +253,10 @@ iframe.onload = () => {
             searchInIframe();  
 
             // Si zoom
-            setIframeZoom(zoomLevel);            
+            setTimeout(() => {
+                setIframeZoom(zoomLevel);
+                document.getElementById("iframe-loading").style.display = "none";
+            }, 500);            
         }; 
 
         document.getElementById('toc').addEventListener('click', function(event) {
@@ -370,7 +394,7 @@ iframe.onload = () => {
             styleTag.id = 'zoom-style';
             iframeDoc.head.appendChild(styleTag);
         }
-        styleTag.textContent = `body { zoom: ${level}; }`;
+        styleTag.textContent = `body, td, th { zoom: ${level}; }`;
 
         // Sauvegarde dans localStorage
         localStorage.setItem('iframeZoom', level);
@@ -378,7 +402,7 @@ iframe.onload = () => {
 
         // Appliquer le zoom initial au chargement
         window.addEventListener('load', () => {
-            setIframeZoom(zoomLevel);
+            setTimeout(() => setIframeZoom(zoomLevel), 2000);
         });
 
         document.getElementById('zoom-in').addEventListener('click', () => {
