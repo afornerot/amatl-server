@@ -2,30 +2,80 @@
 
 {% block localstyle %}
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-size: 13px;
+        }
+        
+        .full-height {
+            height: 100vh;
+            overflow: hidden;
+        }
+        
         content {
             padding:0px;
         }
         ul {
-            padding-left:10px;
-            list-style-type:none;
+            padding-left: 10px;
+            list-style-type: none;
+            margin-bottom: 2px;
         }
         .file-link {
-            font-size:75%;
+            font-size: 12px;
+            color: #e0e0e0;
+            text-decoration: none;
+            display: block;
+            padding: 1px 0;
+        }
+        .file-link:hover {
+            color: #66b3ff;
+        }
+        .folder-toggle {
+            font-size: 12px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        .tree-li {
+            padding-left: 0;
+        }
+        .folder-toggle::before {
+            content: "📁 ";
+            font-size: 11px;
+        }
+        .file-link::before {
+            content: "📄 ";
+            font-size: 11px;
         }
 
         #rightbar {
             width:300px;
+            height: 100vh;
             overflow-y:auto;
         }
 
         #toc {
             padding-left:10px;
-            flex-grow: 1
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 180px);
         }
 
         #toc p, #toc a {
             margin-bottom:0px;
             font-size:12px;
+        }
+        
+        #sidebar-scroll {
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        #file-tree-wrapper {
+            overflow-y: auto;
+            flex-grow: 1;
+            max-height: calc(100vh - {{schemaDir?'250px':'180px'}});
         }
 
     </style>
@@ -34,18 +84,19 @@
 {% import _self as macros %}
 
 {% block body %}
-    <div class="d-flex">
-        <div class="sidebar d-flex flex-column" style="width: 300px; border-right: 1px solid #ccc; padding: 10px;">
-            <div class="flex-grow-1">
+    <div class="d-flex full-height">
+        <div id="sidebar-scroll" class="d-flex flex-column" style="border-right: 1px solid #ccc; padding: 10px;">
+            <div id="file-tree-wrapper">
                 {{ macros.file_tree(files, projectId, '', 0) }}
             </div>
 
-            {% if schemaDir %}
-                <div id="mcd-bar" class="my-3">    
-                    <a href="{{schemaDir~'/index.html'}}" target="_blank"><i class='fas fa-database fa-2x me-2'></i><span style="font-size: 25px">MCD</span></a>
-                </div>
-            {% endif %}
             <div id="search-bar" class="my-3">
+                {% if schemaDir %}
+                    <div id="mcd-bar" class="my-3">    
+                        <a href="{{schemaDir~'/index.html'}}" target="_blank"><i class='fas fa-database fa-2x me-2'></i><span style="font-size: 25px">MCD</span></a>
+                    </div>
+                {% endif %}
+
                 <div class="input-group align-items-center">
                     <input type="text" id="search-input" class="form-control border-0 border-bottom" placeholder="Rechercher..." />
 
@@ -61,10 +112,10 @@
                 </div>
             </div>
         
-            <div style="zoom:60%">projectID = {{ projectUuid }} </div>
+            <div style="font-size: 10px;">projectID = {{ projectUuid }} </div>
         </div>
         <div id="file-viewer" style="flex-grow: 1; padding: 10px; background-color: #fff">
-            <iframe id="preview-frame" style="width: 100%; height: 600px; border: none;"></iframe>
+            <iframe id="preview-frame" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
         <div id="rightbar" class="d-flex flex-column">
             <div id="zoom-controls">
@@ -93,24 +144,11 @@
                 </a>
             </div>      
         </div>
-
     </div>
 
     <script>
-//-- Ajustement à la taille de la windows ---------------------------------------------------------------------------------------
-        function adjustIframeHeight() {
-            let iframe = document.getElementById("preview-frame");
-            iframe.style.height = window.innerHeight - iframe.offsetTop - 20+ "px";
-
-            let rightbar = document.getElementById("rightbar");
-            rightbar.style.height = window.innerHeight - rightbar.offsetTop - 20+ "px";            
-        }
-
 //-- Affichage de l'iframe ------------------------------------------------------------------------------------------------------
         document.addEventListener("DOMContentLoaded", function () {
-            adjustIframeHeight();
-            window.addEventListener("resize", adjustIframeHeight);
-
             document.querySelectorAll(".folder-toggle").forEach(function(toggle) {
                 toggle.addEventListener("click", function() {
                     let sublist = this.nextElementSibling;
@@ -172,28 +210,25 @@
 //-- Récupération du TOC --------------------------------------------------------------------------------------------------------
         const iframe = document.getElementById("preview-frame");
         // Attendre que le contenu soit chargé
-        iframe.onload = () => {
+iframe.onload = () => {
             try {
                 const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                const tocElement = iframeDocument.querySelector('.toc');
                 const tocContainer = document.getElementById('toc');
 
-                if (tocElement) {
-                    // Par exemple, log le HTML de la TOC
-                    console.log('TOC trouvée');
-                    tocContainer.innerHTML = '<h5>Table des Matières</h5>'+tocElement.innerHTML;
-                    // Tu peux aussi copier, manipuler, cloner, etc.
-                    // const cloned = tocElement.cloneNode(true);
-                    // document.body.appendChild(cloned);
-                } else {
-                    tocContainer.innerHTML = '';
-                    console.log('Pas de .toc trouvée dans l’iframe');
-                }
+                const updateToc = () => {
+                    const tocElement = iframeDocument.querySelector('.amatl-toc');
+                    if (tocElement) {
+                        tocContainer.innerHTML = '<h5>Table des Matières</h5>'+tocElement.outerHTML;
+                    }
+                };
+
+                updateToc();
+                setTimeout(updateToc, 100);
             } catch (e) {
-                console.error('Impossible d’accéder au contenu de l’iframe :', e);
+                console.error('Impossible d\'accéder au contenu de l\'iframe :', e);
             }
 
-            // Si zone de recherche 
+            // Si zone de recherche
             searchInIframe();  
 
             // Si zoom
@@ -319,7 +354,7 @@
         });
 
 //-- Zoom -----------------------------------------------------------------------------------------------------------------------
-        let zoomLevel = parseFloat(localStorage.getItem('iframeZoom')) || 1.0;
+        let zoomLevel = parseFloat(localStorage.getItem('iframeZoom')) || 0.8;
         const zoomStep = 0.1;
         const minZoom = 0.5;
         const maxZoom = 3.0;
@@ -372,9 +407,9 @@
 
 {% macro file_tree(files, projectId, basePath, niveau) %}
     {% if files is iterable %}
-        <ul {{(niveau>0?'style="display:none;"':'')}}>
+        <ul {{(niveau>0?'style="display:none;"':'')}} class="tree-ul">
             {% for file, subFiles in files %}
-                <li>
+                <li class="tree-li">
                     {% if subFiles is iterable %}
                         <span class="folder-toggle" style="cursor: pointer; font-weight: bold;">{{ file }}</span>
                         {{ _self.file_tree(subFiles, projectId, file, niveau+1) }}
