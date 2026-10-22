@@ -107,7 +107,7 @@ class GitService
         }
 
         // Exécute git pull
-        $process = new Process(['git', '-C', $projectPath, 'pull']);
+        $process = new Process(['git', '-c', 'safe.directory=*', '-C', $projectPath, 'pull']);
         $process->run();
 
         if (!$process->isSuccessful()) {

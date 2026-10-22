@@ -85,11 +85,16 @@
             width: 300px;
             flex-shrink: 0;
         }
+
         
         #file-tree-wrapper {
             overflow-y: auto;
             flex-grow: 1;
             max-height: calc(100vh - {{schemaDir?'250px':'180px'}});
+        }
+
+        .fullh {
+            height: calc(100vh - 75px);
         }
 
     </style>
@@ -98,7 +103,7 @@
 {% import _self as macros %}
 
 {% block body %}
-    <div class="d-flex full-height">
+    <div class="d-flex fullh">
         <div id="sidebar-scroll" class="d-flex flex-column" style="border-right: 1px solid #ccc; padding: 10px;">
             <div id="file-tree-wrapper">
                 {{ macros.file_tree(files, projectId, '', 0) }}
@@ -273,7 +278,10 @@ iframe.onload = () => {
             const targetEl = iframeDoc.querySelector(href); // ex: #section2
 
             if (targetEl) {
-                targetEl.scrollIntoView({ behavior: 'smooth' });
+                iframe.contentWindow.scrollTo({
+                    top: targetEl.offsetTop - 20,
+                    behavior: 'smooth'
+                });
             }
         });
 
@@ -402,7 +410,7 @@ iframe.onload = () => {
 
         // Appliquer le zoom initial au chargement
         window.addEventListener('load', () => {
-            setTimeout(() => setIframeZoom(zoomLevel), 2000);
+            setTimeout(() => setIframeZoom(zoomLevel), 100000);
         });
 
         document.getElementById('zoom-in').addEventListener('click', () => {

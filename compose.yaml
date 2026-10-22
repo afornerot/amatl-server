@@ -21,7 +21,7 @@ services:
     depends_on: 
       - mariadb
     ports:
-      - "8008:80"
+      - "8029:80"
     volumes:
       - ./config:/app/config:delegated
       - ./src:/app/src:delegated
@@ -30,31 +30,6 @@ services:
       - ./uploads:/app/uploads:delegated
       - ./.env:/app/.env:delegated
       - ./.env.local:/app/.env.local:delegated
-  adminer:
-    image: adminer
-    container_name: amatl-adminer
-    restart: always
-    ports:
-      - 6088:8080
-  corpus:
-    image: ghcr.io/bornholm/corpus-server:latest
-    container_name: corpus
-    restart: unless-stopped
-    ports:
-      - 3002:3002
-    environment:
-      - CORPUS_HTTP_BASE_URL=http://corpus:3002
-      - CORPUS_LLM_PROVIDER_KEY=changeme
-      - CORPUS_LLM_PROVIDER_BASE_URL=https://api.mistral.ai/v1/
-      - CORPUS_LLM_PROVIDER_CHAT_COMPLETION_MODEL=mistral-small-latest
-      - CORPUS_LLM_PROVIDER_EMBEDDINGS_MODEL=mistral-embed
-      - CORPUS_HTTP_AUTH_WRITER_USERNAME=writer
-      - CORPUS_HTTP_AUTH_WRITER_PASSWORD=changeme
-      - CORPUS_LOGGER_LEVEL=-4
-    volumes:
-      - corpus_data:/data
-    stdin_open: true
-    tty: true
 
 volumes:
   mariadb-data:
