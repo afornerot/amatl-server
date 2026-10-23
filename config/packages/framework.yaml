@@ -1,4 +1,10 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
+parameters:
+    # Défaut si TRUSTED_PROXIES n'est pas fournie par le déploiement : l'app n'est
+    # joignable que via le reverse proxy. Restreindre via la variable d'environnement
+    # (ou .env.local) le jour où l'app est exposée directement.
+    trusted_proxies_default: '0.0.0.0/0'
+
 framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
@@ -8,6 +14,13 @@ framework:
 
     #esi: true
     #fragments: true
+
+    # Proxies de confiance : renseigner TRUSTED_PROXIES (IP/CIDR des proxies)
+    # uniquement quand l'app est servie derrière un reverse proxy.
+    # On ne truste volontairement PAS x-forwarded-port : certains hops envoient
+    # le port interne (80), ce qui produisait des URLs « https://hote:80 ».
+    trusted_proxies: '%env(default:trusted_proxies_default:TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto']
 
 when@test:
     framework:
