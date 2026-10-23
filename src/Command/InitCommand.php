@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use SortDirection;
 
 #[AsCommand(
     name: 'app:init',
@@ -34,7 +35,7 @@ class InitCommand extends Command
 
         // Création d'un project par defaut
         $io->text("> Création d'un project par defaut");
-        $project = $this->em->getRepository("App\Entity\Project")->findOneBy([], ['id' => 'ASC']);
+        $project = $this->em->getRepository("App\Entity\Project")->findOneBy([], ['id' => SortDirection::Ascending]);
         if (!$project) {
             $project = new Project();
             $project->setTitle($this->params->get('appName'));
