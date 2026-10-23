@@ -1,3 +1,8 @@
+parameters:
+    # Valeur par défaut si DATABASE_SERVER_VERSION n'est pas fournie par le
+    # déploiement (sinon EnvNotFoundException au démarrage du conteneur).
+    database_server_version: '12.1.2-MariaDB'
+
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
@@ -5,7 +10,7 @@ doctrine:
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file).
         # Without it, DBAL 4 cannot detect the MariaDB platform and emits a deprecation.
-        server_version: '%env(DATABASE_SERVER_VERSION)%'
+        server_version: '%env(default:database_server_version:DATABASE_SERVER_VERSION)%'
 
         profiling_collect_backtrace: '%kernel.debug%'
     orm:
