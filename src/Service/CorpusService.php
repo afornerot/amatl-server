@@ -10,15 +10,14 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class CorpusService
 {
-    private Client $client;
-    private bool $corpusActivate;
-    private string $corpusInstance;
-    private string $corpusUrl;
-    private string $corpusUsername;
-    private string $corpusPassword;
-    private LoggerInterface $logger;
+    private readonly Client $client;
+    private readonly bool $corpusActivate;
+    private readonly string $corpusInstance;
+    private readonly string $corpusUrl;
+    private readonly string $corpusUsername;
+    private readonly string $corpusPassword;
 
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
+    public function __construct(ParameterBagInterface $params, private readonly LoggerInterface $logger)
     {
         $this->client = new Client();
         $this->corpusActivate = $params->get('corpusActivate');
@@ -26,7 +25,6 @@ class CorpusService
         $this->corpusUrl = $params->get('corpusUrl');
         $this->corpusUsername = $params->get('corpusUsername');
         $this->corpusPassword = $params->get('corpusPassword');
-        $this->logger = $logger;
     }
 
     public function indexCorpus(Project $project, string $projectPath, string $filePath): bool

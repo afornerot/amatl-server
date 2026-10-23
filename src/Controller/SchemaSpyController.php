@@ -7,11 +7,12 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
 class SchemaSpyController extends AbstractController
 {
-    #[Route('/uploads/schemaspy/{id}/{path}', name: 'schemaspy', requirements: ['path' => '.+'])]
+    #[Route('/uploads/schemaspy/{id}/{path}', name: 'schemaspy', requirements: ['path' => Requirement::CATCH_ALL])]
     public function serve(int $id, string $path, EntityManagerInterface $em): Response
     {
         $project = $em->getRepository(Project::class)->find($id);

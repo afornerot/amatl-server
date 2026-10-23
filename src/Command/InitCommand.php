@@ -20,16 +20,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 )]
 class InitCommand extends Command
 {
-    private EntityManagerInterface $em;
-    private ParameterBagInterface $params;
-    private UserPasswordHasherInterface $passwordHasher;
-
-    public function __construct(EntityManagerInterface $em, ParameterBagInterface $params, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly ParameterBagInterface $params, private readonly UserPasswordHasherInterface $passwordHasher)
     {
-        $this->em = $em;
-        $this->params = $params;
-        $this->passwordHasher = $passwordHasher;
-
         parent::__construct();
     }
 
@@ -52,7 +44,7 @@ class InitCommand extends Command
             $this->em->flush();
         }
 
-        $admins=array_map('trim', explode(',', $this->params->get('appAdmin')));
+        $admins=array_map(trim(...), explode(',', $this->params->get('appAdmin')));
         foreach($admins as $admin) {
             $user = $this->em->getRepository("App\Entity\User")->findOneBy(['username' => $admin]);
             if (!$user) {

@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-final class UploadListener
+final readonly class UploadListener
 {
     private string $projectDir;
 

@@ -120,6 +120,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -128,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAvatar(): ?string
     {
-        return $this->avatar ? $this->avatar : 'medias/avatar/noavatar.png';
+        return $this->avatar ?: 'medias/avatar/noavatar.png';
     }
 
     public function setAvatar(?string $avatar): static

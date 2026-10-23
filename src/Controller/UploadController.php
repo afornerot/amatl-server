@@ -12,17 +12,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UploadController extends AbstractController
 {
-    private ImageService $imageService;
-
-    public function __construct(ImageService $imageService)
+    public function __construct(private readonly ImageService $imageService)
     {
-        $this->imageService = $imageService;
     }
 
     #[Route('/user/upload/crop01/{endpoint}', name: 'app_user_upload_crop01')]
     public function crop01(string $endpoint, Request $request): Response
     {
-        $reportThumb = $request->get('reportThumb');
+        $reportThumb = $request->query->get('reportThumb');
 
         return $this->render('upload\crop01.html.twig', [
             'useheader' => false,
@@ -36,9 +33,9 @@ class UploadController extends AbstractController
     #[Route('/user/upload/crop02', name: 'app_user_upload_crop02')]
     public function crop02(Request $request): Response
     {
-        $reportThumb = $request->get('reportThumb');
-        $path = $request->get('path');
-        $file = $request->get('file');
+        $reportThumb = $request->query->get('reportThumb');
+        $path = $request->query->get('path');
+        $file = $request->query->get('file');
         $image = $this->getParameter('kernel.project_dir').'/public/'.$path.'/'.$file;
         $thumb = $this->getParameter('kernel.project_dir').'/public/'.$path.'/thumb_'.$file;
 

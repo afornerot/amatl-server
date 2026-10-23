@@ -1,0 +1,38 @@
+services:
+  mariadb:
+    image: mariadb
+    container_name: amatl-test-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: amatl
+      MYSQL_USER: user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - mariadb-test-data:/var/lib/mysql
+
+  amatl:
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile
+    image: reg.cadoles.com/envole/amatl:migration-test
+    container_name: amatl-test
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    ports:
+      - "8039:80"
+    environment:
+      DATABASE_URL: "mysql://user:changeme@mariadb:3306/amatl"
+      DATABASE_SERVER_VERSION: "12.1.2-MariaDB"
+    volumes:
+      - ./config:/app/config:delegated
+      - ./src:/app/src:delegated
+      - ./templates:/app/templates:delegated
+      - ./public:/app/public:delegated
+      - ./uploads:/app/uploads:delegated
+      - ./.env:/app/.env:delegated
+      - ./.env.local:/app/.env.local:delegated
+
+volumes:
+  mariadb-test-data:

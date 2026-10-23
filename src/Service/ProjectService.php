@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ProjectService
 {
-    private string $uploadBasePath;
+    private readonly string $uploadBasePath;
 
     public function __construct(ParameterBagInterface $params)
     {

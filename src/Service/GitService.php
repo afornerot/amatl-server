@@ -13,15 +13,11 @@ use Symfony\Component\Process\Process;
 
 class GitService
 {
-    private string $uploadBasePath;
-    private LoggerInterface $logger;
-    private CorpusService $corpusService;
+    private readonly string $uploadBasePath;
 
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger, CorpusService $corpusService)
+    public function __construct(ParameterBagInterface $params, private readonly LoggerInterface $logger, private readonly CorpusService $corpusService)
     {
         $this->uploadBasePath = $params->get('kernel.project_dir').'/uploads/';
-        $this->logger = $logger;
-        $this->corpusService = $corpusService;
     }
 
     public function cloneRepository(Project $project): bool
@@ -132,7 +128,7 @@ class GitService
             }
 
             $output = $diffProcess->getOutput();
-            $htmlFiles = array_filter(explode("\n", trim($output)), fn ($f) => '.html' === substr($f, -5));
+            $htmlFiles = array_filter(explode("\n", trim($output)), fn ($f) => str_ends_with($f, '.html'));
         }
 
         foreach ($htmlFiles as $relativePath) {

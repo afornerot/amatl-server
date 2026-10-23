@@ -29,3 +29,7 @@ phpstan.neon
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> symfony/framework-bundle (config reference) ###
+/config/reference.php
+###< symfony/framework-bundle (config reference) ###

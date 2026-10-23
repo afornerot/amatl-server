@@ -11,11 +11,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CorpusController extends AbstractController
 {
-    private CorpusService $corpusService;
-
-    public function __construct(CorpusService $corpusService)
+    public function __construct(private readonly CorpusService $corpusService)
     {
-        $this->corpusService = $corpusService;
     }
 
     #[Route('/corpus', name: 'app_corpus')]

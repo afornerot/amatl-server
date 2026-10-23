@@ -16,17 +16,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class DynamicAuthenticator extends AbstractAuthenticator
 {
-    private string $modeAuth;
-    private UserRepository $userRepository;
-    private CasUserProvider $casUserProvider;
-    private ParameterBagInterface $parameterBag;
-
-    public function __construct(string $modeAuth, UserRepository $userRepository, CasUserProvider $casUserProvider, ParameterBagInterface $parameterBag)
+    public function __construct(private readonly string $modeAuth, private readonly UserRepository $userRepository, private readonly CasUserProvider $casUserProvider, private readonly ParameterBagInterface $parameterBag)
     {
-        $this->modeAuth = $modeAuth;
-        $this->userRepository = $userRepository;
-        $this->casUserProvider = $casUserProvider;
-        $this->parameterBag = $parameterBag;
     }
 
     public function supports(Request $request): ?bool
@@ -47,16 +38,11 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        switch ($this->modeAuth) {
-            case 'SQL':
-                return $this->authenticateWithSql($request);
-
-            case 'CAS':
-                return $this->authenticateWithCas($request);
-
-            default:
-                throw new \InvalidArgumentException('Invalid authentication method');
-        }
+        return match ($this->modeAuth) {
+            'SQL' => $this->authenticateWithSql($request),
+            'CAS' => $this->authenticateWithCas($request),
+            default => throw new \InvalidArgumentException('Invalid authentication method'),
+        };
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -86,9 +72,7 @@ class DynamicAuthenticator extends AbstractAuthenticator
         }
 
         return new Passport(
-            new UserBadge($username, function ($userIdentifier) {
-                return $this->userRepository->findOneBy(['username' => $userIdentifier]);
-            }),
+            new UserBadge($username, fn($userIdentifier) => $this->userRepository->findOneBy(['username' => $userIdentifier])),
             new PasswordCredentials($password)
         );
     }
@@ -117,9 +101,7 @@ class DynamicAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('CAS authentication failed.');
         }
 
-        $userBadge = new UserBadge($username, function ($userIdentifier) use ($attributes) {
-            return $this->casUserProvider->loadUserByIdentifierAndAttributes($userIdentifier, $attributes);
-        });
+        $userBadge = new UserBadge($username, fn($userIdentifier) => $this->casUserProvider->loadUserByIdentifierAndAttributes($userIdentifier, $attributes));
 
         return new SelfValidatingPassport($userBadge);
     }

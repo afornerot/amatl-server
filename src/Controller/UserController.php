@@ -166,7 +166,7 @@ class UserController extends AbstractController
     #[Route('/user/selectproject', name: 'app_user_selectproject')]
     public function selectproject(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $id = $request->get('id');
+        $id = $request->request->get('id');
 
         $project = $em->getRepository(Project::class)->find($id);
         if (!$project) {

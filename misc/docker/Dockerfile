@@ -1,4 +1,4 @@
-FROM reg.cadoles.com/envole/nineapache:8.2
+FROM reg.cadoles.com/envole/nineapache:8.5
 
 USER root
 COPY ./misc/docker/apache.conf /etc/apache2/conf.d/nine/site.conf

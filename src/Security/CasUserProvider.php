@@ -13,15 +13,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class CasUserProvider implements UserProviderInterface
 {
-    private UserRepository $userRepository;
-    private EntityManagerInterface $em;
-    private ParameterBagInterface $parameterBag;
-
-    public function __construct(UserRepository $userRepository, EntityManagerInterface $em, ParameterBagInterface $parameterBag)
+    public function __construct(private readonly UserRepository $userRepository, private readonly EntityManagerInterface $em, private readonly ParameterBagInterface $parameterBag)
     {
-        $this->userRepository = $userRepository;
-        $this->em = $em;
-        $this->parameterBag = $parameterBag;
     }
 
     /**

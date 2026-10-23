@@ -15,14 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
 class ProjectController extends AbstractController
 {
-    private GitService $gitService;
-
-    public function __construct(GitService $gitService)
+    public function __construct(private readonly GitService $gitService)
     {
-        $this->gitService = $gitService;
     }
 
     #[Route('/admin/project', name: 'app_admin_project')]
@@ -151,7 +149,7 @@ class ProjectController extends AbstractController
         return $this->redirectToRoute('app_admin_project');
     }
 
-    #[Route('/user/view/{idProject}/{filePath}', name: 'view_file', requirements: ['filePath' => '.+'])]
+    #[Route('/user/view/{idProject}/{filePath}', name: 'view_file', requirements: ['filePath' => Requirement::CATCH_ALL])]
     public function viewFile(int $idProject, string $filePath, EntityManagerInterface $em): Response
     {
         $project = $em->getRepository(Project::class)->find($idProject);
@@ -177,7 +175,7 @@ class ProjectController extends AbstractController
         return new Response($htmlContent);
     }
 
-    #[Route('/user/download/{type}/{idProject}/{filePath}', name: 'download_file', requirements: ['filePath' => '.+'])]
+    #[Route('/user/download/{type}/{idProject}/{filePath}', name: 'download_file', requirements: ['filePath' => Requirement::CATCH_ALL])]
     public function downloadFile(string $type, int $idProject, string $filePath, EntityManagerInterface $em): BinaryFileResponse
     {
         $project = $em->getRepository(Project::class)->find($idProject);

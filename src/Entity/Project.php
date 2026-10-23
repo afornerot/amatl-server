@@ -67,7 +67,7 @@ class Project
 
     public function getLogo(): ?string
     {
-        return $this->logo ? $this->logo : 'medias/logo/logo.png';
+        return $this->logo ?: 'medias/logo/logo.png';
     }
 
     public function setLogo(?string $logo): static

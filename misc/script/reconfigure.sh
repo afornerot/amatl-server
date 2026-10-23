@@ -7,7 +7,7 @@ cd ${DIR}
 cd ../..
 DIR=$(pwd)
 
-bin/console d:s:u --force --complete
+bin/console d:s:u --force
 bin/console app:init
 
 exec $@

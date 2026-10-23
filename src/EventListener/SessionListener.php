@@ -10,15 +10,10 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-final class SessionListener
+final readonly class SessionListener
 {
-    private Security $security;
-    private RouterInterface $router;
-
-    public function __construct(Security $security, RouterInterface $router)
+    public function __construct(private Security $security, private RouterInterface $router)
     {
-        $this->security = $security;
-        $this->router = $router;
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST)]
