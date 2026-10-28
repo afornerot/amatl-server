@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: ./misc/docker/Dockerfile
-    image: reg.cadoles.com/envole/amatl:migration-test
+    image: reg.cadoles.com/envole/amatl-server:migration-test
     container_name: amatl-test
     restart: unless-stopped
     depends_on:
